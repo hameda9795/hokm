@@ -47,25 +47,26 @@
 
 /* ============================================
    Card Sizes - Poker card ratio (2.5:3.5)
+   Bigger cards for better visibility
    ============================================ */
 
 .card-small {
-  width: 46px;
-  height: 64px;
+  width: 50px;
+  height: 70px;
   border-radius: 5px;
 }
 
 .card-medium {
-  width: 60px;
-  height: 84px;
+  width: 65px;
+  height: 91px;
   border-radius: 6px;
 }
 
-/* Large cards for hand - sized to fit 13 cards on mobile */
+/* Large cards for hand - bigger size for grouped layout */
 .card-large {
-  width: 52px;
-  height: 73px;
-  border-radius: 6px;
+  width: 65px;
+  height: 91px;
+  border-radius: 7px;
 }
 
 /* ============================================
@@ -150,28 +151,8 @@
 
 @media (max-width: 375px) {
   .card-large {
-    width: 44px;
-    height: 62px;
-    border-radius: 4px;
-  }
-
-  .card-small {
-    width: 38px;
-    height: 53px;
-    border-radius: 4px;
-  }
-
-  .card-medium {
-    width: 50px;
-    height: 70px;
-    border-radius: 5px;
-  }
-}
-
-@media (min-width: 376px) and (max-width: 480px) {
-  .card-large {
-    width: 50px;
-    height: 70px;
+    width: 52px;
+    height: 73px;
     border-radius: 5px;
   }
 
@@ -180,38 +161,58 @@
     height: 59px;
     border-radius: 4px;
   }
+
+  .card-medium {
+    width: 55px;
+    height: 77px;
+    border-radius: 5px;
+  }
+}
+
+@media (min-width: 376px) and (max-width: 480px) {
+  .card-large {
+    width: 58px;
+    height: 81px;
+    border-radius: 6px;
+  }
+
+  .card-small {
+    width: 46px;
+    height: 64px;
+    border-radius: 5px;
+  }
 }
 
 @media (min-width: 481px) and (max-width: 768px) {
   .card-large {
-    width: 75px;
-    height: 105px;
+    width: 80px;
+    height: 112px;
     border-radius: 8px;
   }
 
   .card-small {
-    width: 55px;
-    height: 77px;
+    width: 58px;
+    height: 81px;
     border-radius: 6px;
   }
 }
 
 @media (min-width: 769px) {
   .card-large {
-    width: 90px;
-    height: 126px;
+    width: 100px;
+    height: 140px;
     border-radius: 10px;
   }
 
   .card-small {
-    width: 65px;
-    height: 91px;
+    width: 70px;
+    height: 98px;
     border-radius: 7px;
   }
 
   .card-medium {
-    width: 80px;
-    height: 112px;
+    width: 85px;
+    height: 119px;
     border-radius: 9px;
   }
 }
@@ -219,20 +220,20 @@
 /* Landscape mobile */
 @media (max-height: 500px) and (orientation: landscape) {
   .card-large {
-    width: 48px;
-    height: 67px;
+    width: 52px;
+    height: 73px;
     border-radius: 5px;
   }
 
   .card-small {
-    width: 38px;
-    height: 53px;
+    width: 40px;
+    height: 56px;
     border-radius: 4px;
   }
 
   .card-medium {
-    width: 52px;
-    height: 73px;
+    width: 55px;
+    height: 77px;
     border-radius: 5px;
   }
 }

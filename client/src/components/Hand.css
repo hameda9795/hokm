@@ -1,6 +1,6 @@
 /* ============================================
-   Hand - Clean Row Layout 2026
-   No scroll, cards fit on screen
+   Hand - 2-Column Suit-Grouped Layout 2026
+   Cards grouped by suit, bigger size
    ============================================ */
 
 .hand-area {
@@ -82,21 +82,81 @@
   50% { box-shadow: 0 4px 25px rgba(16, 185, 129, 0.8); }
 }
 
-/* Container - no scroll */
+/* Container */
 .hand-container {
   width: 100%;
   max-width: 100%;
-  display: flex;
-  justify-content: center;
   padding: 8px 0;
 }
 
-/* Card row */
-.hand-cards {
+/* Two columns layout */
+.hand-columns {
   display: flex;
   justify-content: center;
-  align-items: flex-end;
-  padding: 0 10px;
+  gap: 20px;
+  direction: rtl;
+}
+
+.hand-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Suit group */
+.suit-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  padding: 6px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Suit header */
+.suit-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px;
+  direction: rtl;
+}
+
+.suit-symbol {
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.suit-symbol.red {
+  color: #ef4444;
+  text-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+}
+
+.suit-symbol.black {
+  color: #e2e8f0;
+  text-shadow: 0 0 8px rgba(226, 232, 240, 0.3);
+}
+
+.suit-name {
+  font-size: 0.75em;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+}
+
+.suit-count {
+  font-size: 0.65em;
+  color: rgba(251, 191, 36, 0.8);
+  background: rgba(251, 191, 36, 0.15);
+  padding: 1px 6px;
+  border-radius: 8px;
+  margin-right: auto;
+}
+
+/* Cards row within suit */
+.suit-cards {
+  display: flex;
+  direction: ltr;
 }
 
 /* Card wrapper */
@@ -104,15 +164,15 @@
   flex-shrink: 0;
   transition:
     transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-    filter 0.25s ease,
-    margin 0.2s ease;
+    filter 0.25s ease;
   animation: cardDealIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
   cursor: pointer;
+  margin-left: -18px;
 }
 
 .hand-card-wrapper:first-child {
-  margin-left: 0 !important;
+  margin-left: 0;
 }
 
 /* Hover - lift up */
@@ -124,7 +184,7 @@
 
 /* Selected - golden glow */
 .hand-card-wrapper.selected {
-  transform: translateY(-20px);
+  transform: translateY(-18px);
   filter:
     drop-shadow(0 0 15px rgba(251, 191, 36, 0.7))
     drop-shadow(0 15px 25px rgba(0, 0, 0, 0.4));
@@ -135,11 +195,11 @@
 @keyframes cardDealIn {
   0% {
     opacity: 0;
-    transform: translateY(-100px) scale(0.5);
+    transform: translateY(-80px) scale(0.5);
   }
   60% {
     opacity: 1;
-    transform: translateY(10px) scale(1.05);
+    transform: translateY(8px) scale(1.03);
   }
   100% {
     opacity: 1;
@@ -165,12 +225,42 @@
 }
 
 /* ============================================
-   Responsive - adjust card size for fit
+   Responsive - Mobile first
    ============================================ */
 
 @media (max-width: 375px) {
   .hand-area {
-    padding: 10px 4px;
+    padding: 8px 4px;
+  }
+
+  .hand-columns {
+    gap: 10px;
+  }
+
+  .suit-group {
+    padding: 4px 6px;
+    border-radius: 8px;
+  }
+
+  .suit-header {
+    gap: 4px;
+  }
+
+  .suit-symbol {
+    font-size: 0.95em;
+  }
+
+  .suit-name {
+    font-size: 0.65em;
+  }
+
+  .suit-count {
+    font-size: 0.55em;
+    padding: 1px 4px;
+  }
+
+  .hand-card-wrapper {
+    margin-left: -22px;
   }
 
   .turn-badge {
@@ -180,15 +270,48 @@
   }
 }
 
+@media (min-width: 376px) and (max-width: 480px) {
+  .hand-columns {
+    gap: 14px;
+  }
+
+  .hand-card-wrapper {
+    margin-left: -20px;
+  }
+}
+
 @media (min-width: 481px) {
   .hand-area {
     padding: 15px 12px;
   }
 
-  .turn-badge {
-    font-size: 0.9em;
-    padding: 8px 24px;
-    top: -20px;
+  .hand-columns {
+    gap: 24px;
+  }
+
+  .suit-group {
+    padding: 8px 12px;
+  }
+
+  .suit-header {
+    gap: 8px;
+  }
+
+  .suit-symbol {
+    font-size: 1.3em;
+  }
+
+  .suit-name {
+    font-size: 0.85em;
+  }
+
+  .suit-count {
+    font-size: 0.7em;
+    padding: 2px 8px;
+  }
+
+  .hand-card-wrapper {
+    margin-left: -20px;
   }
 
   .hand-card-wrapper:hover {
@@ -196,20 +319,45 @@
   }
 
   .hand-card-wrapper.selected {
-    transform: translateY(-28px);
+    transform: translateY(-24px);
+  }
+
+  .turn-badge {
+    font-size: 0.9em;
+    padding: 8px 24px;
+    top: -20px;
   }
 }
 
 /* Landscape */
 @media (max-height: 500px) and (orientation: landscape) {
   .hand-area {
-    padding: 8px 4px;
+    padding: 6px 4px;
   }
 
-  .turn-badge {
-    font-size: 0.65em;
-    padding: 4px 12px;
-    top: -12px;
+  .hand-columns {
+    gap: 16px;
+  }
+
+  .suit-group {
+    padding: 4px 6px;
+    gap: 2px;
+  }
+
+  .suit-header {
+    padding: 1px 2px;
+  }
+
+  .suit-symbol {
+    font-size: 0.9em;
+  }
+
+  .suit-name {
+    font-size: 0.6em;
+  }
+
+  .hand-card-wrapper {
+    margin-left: -24px;
   }
 
   .hand-card-wrapper:hover {
@@ -217,7 +365,13 @@
   }
 
   .hand-card-wrapper.selected {
-    transform: translateY(-15px);
+    transform: translateY(-14px);
+  }
+
+  .turn-badge {
+    font-size: 0.65em;
+    padding: 4px 12px;
+    top: -12px;
   }
 }
 
@@ -234,6 +388,6 @@
   }
 
   .hand-card-wrapper.selected {
-    transform: translateY(-15px);
+    transform: translateY(-14px);
   }
 }
