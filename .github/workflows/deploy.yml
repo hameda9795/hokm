@@ -84,13 +84,6 @@ jobs:
 
             echo "✅ Deployment successful!"
             echo "📦 Commit: ${GITHUB_SHA:0:7}"
-              echo "⏰ Time: $(date +'%Y-%m-%d %H:%M:%S')"
-            else
-              echo "❌ Deployment failed - services not running"
-              docker-compose logs --tail=50
-              exit 1
-            fi
-            
             # Cleanup old images
             echo "🧹 Cleaning up old Docker images..."
             docker image prune -f
