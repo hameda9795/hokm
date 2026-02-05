@@ -28,12 +28,13 @@ export const Hand: React.FC<HandProps> = ({
 
   const totalCards = cards.length;
 
-  // Simple arc: rotation only, positioned with flexbox
-  const getCardRotation = (index: number) => {
-    if (totalCards <= 1) return 0;
-    const maxAngle = Math.min(40, totalCards * 3); // Max 40 degrees spread
-    const step = maxAngle / (totalCards - 1);
-    return -maxAngle / 2 + step * index;
+  // Calculate overlap based on card count to fit all cards
+  const getOverlapStyle = () => {
+    // More cards = more overlap
+    if (totalCards <= 5) return { marginLeft: '-15px' };
+    if (totalCards <= 8) return { marginLeft: '-20px' };
+    if (totalCards <= 10) return { marginLeft: '-25px' };
+    return { marginLeft: '-30px' };
   };
 
   return (
@@ -41,20 +42,19 @@ export const Hand: React.FC<HandProps> = ({
       {isMyTurn && (
         <div className="turn-badge">نوبت شما</div>
       )}
-      <div className="hand-scroll">
-        <div className="hand-cards">
+      <div className="hand-container">
+        <div className="hand-cards" style={{ '--card-count': totalCards } as React.CSSProperties}>
           {cards.map((card, index) => {
             const isSelected = selectedCard?.id === card.id;
-            const rotation = getCardRotation(index);
 
             return (
               <div
                 key={card.id}
                 className={`hand-card-wrapper ${isSelected ? 'selected' : ''}`}
                 style={{
-                  transform: `rotate(${rotation}deg)`,
                   zIndex: isSelected ? 100 : index + 1,
                   animationDelay: `${index * 50}ms`,
+                  ...(index > 0 ? getOverlapStyle() : {}),
                 }}
               >
                 <Card

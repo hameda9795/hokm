@@ -50,21 +50,22 @@
    ============================================ */
 
 .card-small {
-  width: 50px;
-  height: 70px;
-  border-radius: 6px;
+  width: 46px;
+  height: 64px;
+  border-radius: 5px;
 }
 
 .card-medium {
-  width: 70px;
-  height: 98px;
-  border-radius: 8px;
+  width: 60px;
+  height: 84px;
+  border-radius: 6px;
 }
 
+/* Large cards for hand - sized to fit 13 cards on mobile */
 .card-large {
-  width: 65px;
-  height: 91px;
-  border-radius: 7px;
+  width: 52px;
+  height: 73px;
+  border-radius: 6px;
 }
 
 /* ============================================
@@ -149,8 +150,28 @@
 
 @media (max-width: 375px) {
   .card-large {
-    width: 52px;
-    height: 73px;
+    width: 44px;
+    height: 62px;
+    border-radius: 4px;
+  }
+
+  .card-small {
+    width: 38px;
+    height: 53px;
+    border-radius: 4px;
+  }
+
+  .card-medium {
+    width: 50px;
+    height: 70px;
+    border-radius: 5px;
+  }
+}
+
+@media (min-width: 376px) and (max-width: 480px) {
+  .card-large {
+    width: 50px;
+    height: 70px;
     border-radius: 5px;
   }
 
@@ -158,26 +179,6 @@
     width: 42px;
     height: 59px;
     border-radius: 4px;
-  }
-
-  .card-medium {
-    width: 58px;
-    height: 81px;
-    border-radius: 6px;
-  }
-}
-
-@media (min-width: 376px) and (max-width: 480px) {
-  .card-large {
-    width: 58px;
-    height: 81px;
-    border-radius: 6px;
-  }
-
-  .card-small {
-    width: 46px;
-    height: 64px;
-    border-radius: 5px;
   }
 }
 
