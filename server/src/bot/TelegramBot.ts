@@ -34,10 +34,18 @@ export class TelegramBot {
   }
 
   private setupHandlers() {
-    // دستور شروع (در چت خصوصی)
+    // دستور شروع
     this.bot.command('start', async (ctx) => {
       const startParam = ctx.match;
+      const isGroup = ctx.chat?.type === 'group' || ctx.chat?.type === 'supergroup';
 
+      // اگر در گروه هستیم، به handlePlayCommand هدایت کن
+      if (isGroup) {
+        await this.handlePlayCommand(ctx, true);
+        return;
+      }
+
+      // در چت خصوصی
       if (startParam && startParam.startsWith('game_')) {
         // Deep link برای پیوستن به بازی
         const gameId = startParam.replace('game_', '');
