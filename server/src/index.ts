@@ -90,6 +90,16 @@ if (botToken && miniAppUrl) {
     // Note: Nginx forwards /webhook/* to this server
     app.use('/webhook/telegram', webhookCallback(telegramBot.getBot(), 'express'));
 
+    // Register webhook with Telegram
+    const webhookUrl = `${miniAppUrl}/webhook/telegram`;
+    telegramBot.getBot().api.setWebhook(webhookUrl)
+      .then(() => {
+        console.log(`✅ Webhook registered: ${webhookUrl}`);
+      })
+      .catch((err) => {
+        console.error('❌ Failed to register webhook:', err);
+      });
+
     // Log webhook info
     console.log(`📡 Webhook endpoint ready at /webhook/telegram`);
   } else {
