@@ -323,11 +323,15 @@ export class SocketHandler {
         .find(c => c.id === cardId);
 
       if (playedCard) {
+        console.log(`[Human] Emitting cardPlayed: ${playedCard.rank} of ${playedCard.suit}, prevTrickLength: ${prevState.currentTrick.cards.length}`);
         this.io.to(gameId).emit('game:cardPlayed', socket.id, playedCard);
+      } else {
+        console.log(`[Human] ERROR: Could not find played card ${cardId} in prevState`);
       }
 
       // بررسی اتمام trick (اگر قبل از بازی 3 کارت بود و الان 0 کارت است، یعنی کارت 4 بازی شد)
       if (state.currentTrick.cards.length === 0 && prevState.currentTrick.cards.length === 3) {
+        console.log(`[Human] Trick completed! Emitting trickWon`);
         const winnerId = state.lastTrickWinner;
         if (winnerId) {
           const winner = engine.getPlayer(winnerId);

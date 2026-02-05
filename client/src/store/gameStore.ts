@@ -73,33 +73,36 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   setGameState: (state) => {
     const { showingTrickResult, displayedTrickCards, localTrickCards } = get();
+    const serverCardCount = state.currentTrick?.cards?.length || 0;
+    console.log('[setGameState] serverCards:', serverCardCount, 'localCards:', localTrickCards.length, 'showingResult:', showingTrickResult, 'phase:', state.phase);
 
     // If we're showing trick result, queue the state update but keep displayed cards
     if (showingTrickResult) {
+      console.log('[setGameState] Queueing state (showingTrickResult)');
       set({ pendingGameState: state });
       return;
     }
 
     // If we have displayed cards (showing result), keep them and queue new state
     if (displayedTrickCards.length === 4) {
+      console.log('[setGameState] Queueing state (displayedTrickCards)');
       set({ pendingGameState: state });
       return;
     }
 
     // Sync local trick cards with server state when server has more cards
     // This handles the case when we miss a cardPlayed event
-    const serverCardCount = state.currentTrick?.cards?.length || 0;
     if (serverCardCount > localTrickCards.length && state.phase === 'playing') {
+      console.log('[setGameState] Syncing from server, server has more cards');
       set({ localTrickCards: [...state.currentTrick.cards] });
     }
 
-    // If server trick is empty but we have local cards (new trick started), reset
-    if (serverCardCount === 0 && localTrickCards.length > 0 && localTrickCards.length < 4) {
-      set({ localTrickCards: [] });
-    }
+    // DON'T clear local trick cards here - let clearTrickDisplay handle it
+    // This was causing the 4th card to be lost when state arrives before cardPlayed event
 
     // Clear local trick cards when phase changes away from playing
     if (state.phase !== 'playing' && localTrickCards.length > 0) {
+      console.log('[setGameState] Clearing localTrickCards (phase changed)');
       set({ localTrickCards: [] });
     }
 
@@ -135,7 +138,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   addPlayedCard: (playerId, card) => {
     const { gameState, localTrickCards, showingTrickResult } = get();
-    if (!gameState) return;
+    console.log('[addPlayedCard] Card:', card.rank, card.suit, 'from:', playerId);
+    console.log('[addPlayedCard] Current localTrickCards:', localTrickCards.length, 'showingTrickResult:', showingTrickResult);
+
+    if (!gameState) {
+      console.log('[addPlayedCard] No gameState, returning');
+      return;
+    }
 
     // Remove card from hand if it's mine
     const { playerId: myId, myHand } = get();
@@ -152,19 +161,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (!alreadyExists) {
         const newLocalTrickCards = [...localTrickCards, { playerId, card }];
         set({ localTrickCards: newLocalTrickCards });
+        console.log('[addPlayedCard] Added card, new length:', newLocalTrickCards.length);
 
         // If this is the 4th card, start the 3-second display timer
         if (newLocalTrickCards.length === 4) {
+          console.log('[addPlayedCard] 4 cards! Starting 3-second display');
           set({
             showingTrickResult: true,
             displayedTrickCards: newLocalTrickCards
           });
 
           setTimeout(() => {
+            console.log('[addPlayedCard] 3 seconds passed, clearing display');
             get().clearTrickDisplay();
           }, 3000);
         }
+      } else {
+        console.log('[addPlayedCard] Card already exists, skipping');
       }
+    } else {
+      console.log('[addPlayedCard] showingTrickResult is true, skipping');
     }
   },
 
