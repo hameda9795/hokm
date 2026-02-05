@@ -15,7 +15,8 @@
       "Bash(d:/tmp/hokm/cloudflared.exe tunnel --url http://localhost:3000)",
       "Bash(d:/tmp/hokm/cloudflared.exe tunnel --url http://localhost:3001)",
       "Bash(npm run build:server:*)",
-      "Bash(npm run build:client:*)"
+      "Bash(npm run build:client:*)",
+      "Bash(ls:*)"
     ]
   }
 }

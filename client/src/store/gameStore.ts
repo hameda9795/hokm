@@ -28,6 +28,9 @@ interface GameStore {
   displayedTrickCards: TrickCard[];
   pendingGameState: GameState | null;
 
+  // Local trick cards - built from cardPlayed events
+  localTrickCards: TrickCard[];
+
   // Actions
   setConnected: (connected: boolean) => void;
   setPlayerId: (id: string) => void;
@@ -57,7 +60,8 @@ const initialState = {
   showingTrickResult: false,
   trickWinnerId: null as string | null,
   displayedTrickCards: [] as TrickCard[],
-  pendingGameState: null as GameState | null
+  pendingGameState: null as GameState | null,
+  localTrickCards: [] as TrickCard[]
 };
 
 export const useGameStore = create<GameStore>((set, get) => ({
@@ -68,7 +72,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   setPlayerId: (id) => set({ playerId: id }),
 
   setGameState: (state) => {
-    const { showingTrickResult, displayedTrickCards } = get();
+    const { showingTrickResult, displayedTrickCards, localTrickCards } = get();
 
     // If we're showing trick result, queue the state update but keep displayed cards
     if (showingTrickResult) {
@@ -76,31 +80,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // Check if this state has 4 cards (trick just completed)
-    const newCardCount = state.currentTrick?.cards?.length || 0;
-
-    // When 4th card arrives - store cards separately and start the delay
-    if (newCardCount === 4 && state.phase === 'playing') {
-      // Store the 4 cards for display
-      const cardsToDisplay = [...state.currentTrick.cards];
-
-      set({
-        gameState: state,
-        showingTrickResult: true,
-        displayedTrickCards: cardsToDisplay
-      });
-
-      // Start 3 second timer
-      setTimeout(() => {
-        get().clearTrickDisplay();
-      }, 3000);
-      return;
-    }
-
     // If we have displayed cards (showing result), keep them and queue new state
     if (displayedTrickCards.length === 4) {
       set({ pendingGameState: state });
       return;
+    }
+
+    // Sync local trick cards with server state when server has more cards
+    // This handles the case when we miss a cardPlayed event
+    const serverCardCount = state.currentTrick?.cards?.length || 0;
+    if (serverCardCount > localTrickCards.length && state.phase === 'playing') {
+      set({ localTrickCards: [...state.currentTrick.cards] });
+    }
+
+    // If server trick is empty but we have local cards (new trick started), reset
+    if (serverCardCount === 0 && localTrickCards.length > 0 && localTrickCards.length < 4) {
+      set({ localTrickCards: [] });
+    }
+
+    // Clear local trick cards when phase changes away from playing
+    if (state.phase !== 'playing' && localTrickCards.length > 0) {
+      set({ localTrickCards: [] });
     }
 
     set({ gameState: state });
@@ -134,7 +134,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   setShowHokmSelector: (show) => set({ showHokmSelector: show }),
 
   addPlayedCard: (playerId, card) => {
-    const { gameState } = get();
+    const { gameState, localTrickCards, showingTrickResult } = get();
     if (!gameState) return;
 
     // Remove card from hand if it's mine
@@ -145,10 +145,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
         selectedCard: null
       });
     }
+
+    // Add card to local trick (if not showing result and card not already there)
+    if (!showingTrickResult) {
+      const alreadyExists = localTrickCards.some(t => t.card.id === card.id);
+      if (!alreadyExists) {
+        const newLocalTrickCards = [...localTrickCards, { playerId, card }];
+        set({ localTrickCards: newLocalTrickCards });
+
+        // If this is the 4th card, start the 3-second display timer
+        if (newLocalTrickCards.length === 4) {
+          set({
+            showingTrickResult: true,
+            displayedTrickCards: newLocalTrickCards
+          });
+
+          setTimeout(() => {
+            get().clearTrickDisplay();
+          }, 3000);
+        }
+      }
+    }
   },
 
   setTrickWinner: (winnerId) => {
-    const { gameState, showingTrickResult } = get();
+    const { localTrickCards, showingTrickResult } = get();
 
     // If we already have 4 cards displayed, just set the winner
     if (showingTrickResult) {
@@ -156,12 +177,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // If trick won but we don't have cards displayed yet, store current trick cards
-    if (gameState?.currentTrick?.cards?.length === 4) {
+    // If trick won and we have 4 cards locally, display them
+    if (localTrickCards.length === 4) {
       set({
         trickWinnerId: winnerId,
         showingTrickResult: true,
-        displayedTrickCards: [...gameState.currentTrick.cards]
+        displayedTrickCards: [...localTrickCards]
       });
 
       // Start 3 second timer
@@ -176,11 +197,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
   clearTrickDisplay: () => {
     const { pendingGameState, playerId } = get();
 
-    // Clear displayed cards and apply pending state
+    // Clear displayed cards and local trick cards, apply pending state
     set({
       showingTrickResult: false,
       trickWinnerId: null,
-      displayedTrickCards: []
+      displayedTrickCards: [],
+      localTrickCards: []
     });
 
     if (pendingGameState) {
