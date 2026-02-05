@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card } from './Card';
-import { Card as CardType, Suit, SUIT_SYMBOLS, SUIT_NAMES_FA } from '../types';
+import { Card as CardType, Suit } from '../types';
 import './Hand.css';
 
 interface HandProps {
@@ -36,14 +36,11 @@ export const Hand: React.FC<HandProps> = ({
     return true;
   };
 
-  // Group cards by suit
+  // Group cards by suit (always include all suits for consistent layout)
   const groupedCards = SUIT_ORDER.reduce((acc, suit) => {
-    const suitCards = cards
+    acc[suit] = cards
       .filter(card => card.suit === suit)
       .sort((a, b) => RANK_ORDER[b.rank] - RANK_ORDER[a.rank]);
-    if (suitCards.length > 0) {
-      acc[suit] = suitCards;
-    }
     return acc;
   }, {} as Record<Suit, CardType[]>);
 
@@ -52,14 +49,7 @@ export const Hand: React.FC<HandProps> = ({
   const rightSuits: Suit[] = ['spades', 'clubs'];
 
   const renderSuitGroup = (suit: Suit, suitCards: CardType[]) => (
-    <div key={suit} className={`suit-group suit-${suit}`}>
-      <div className="suit-header">
-        <span className={`suit-symbol ${suit === 'hearts' || suit === 'diamonds' ? 'red' : 'black'}`}>
-          {SUIT_SYMBOLS[suit]}
-        </span>
-        <span className="suit-name">{SUIT_NAMES_FA[suit]}</span>
-        <span className="suit-count">{suitCards.length}</span>
-      </div>
+    <div key={suit} className={`suit-group suit-${suit} ${suitCards.length === 0 ? 'empty' : ''}`}>
       <div className="suit-cards">
         {suitCards.map((card, index) => {
           const isSelected = selectedCard?.id === card.id;
@@ -88,9 +78,7 @@ export const Hand: React.FC<HandProps> = ({
 
   const renderColumn = (suits: Suit[], columnClass: string) => (
     <div className={`hand-column ${columnClass}`}>
-      {suits.map(suit =>
-        groupedCards[suit] ? renderSuitGroup(suit, groupedCards[suit]) : null
-      )}
+      {suits.map(suit => renderSuitGroup(suit, groupedCards[suit]))}
     </div>
   );
 

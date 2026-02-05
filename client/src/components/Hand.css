@@ -1,6 +1,6 @@
 /* ============================================
    Hand - 2-Column Suit-Grouped Layout 2026
-   Cards grouped by suit, bigger size
+   Cards only, no headers
    ============================================ */
 
 .hand-area {
@@ -12,8 +12,8 @@
       rgba(8, 15, 25, 0.95) 30%,
       rgba(5, 10, 18, 0.98) 100%);
   border-top: 1px solid rgba(251, 191, 36, 0.2);
-  padding: 12px 8px;
-  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  padding: 10px 8px;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -86,71 +86,34 @@
 .hand-container {
   width: 100%;
   max-width: 100%;
-  padding: 8px 0;
+  padding: 4px 0;
 }
 
 /* Two columns layout */
 .hand-columns {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 16px;
   direction: rtl;
 }
 
 .hand-column {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
+  min-width: 80px;
 }
 
-/* Suit group */
+/* Suit group - minimal styling, fixed height */
 .suit-group {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 12px;
-  padding: 6px 8px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-/* Suit header */
-.suit-header {
-  display: flex;
+  min-height: 95px;
   align-items: center;
-  gap: 6px;
-  padding: 2px 4px;
-  direction: rtl;
 }
 
-.suit-symbol {
-  font-size: 1.1em;
-  font-weight: bold;
-}
-
-.suit-symbol.red {
-  color: #ef4444;
-  text-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
-}
-
-.suit-symbol.black {
-  color: #e2e8f0;
-  text-shadow: 0 0 8px rgba(226, 232, 240, 0.3);
-}
-
-.suit-name {
-  font-size: 0.75em;
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: 600;
-}
-
-.suit-count {
-  font-size: 0.65em;
-  color: rgba(251, 191, 36, 0.8);
-  background: rgba(251, 191, 36, 0.15);
-  padding: 1px 6px;
-  border-radius: 8px;
-  margin-right: auto;
+/* Hide empty suit groups but keep space */
+.suit-group.empty {
+  visibility: hidden;
 }
 
 /* Cards row within suit */
@@ -168,7 +131,7 @@
   animation: cardDealIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
   cursor: pointer;
-  margin-left: -18px;
+  margin-left: -16px;
 }
 
 .hand-card-wrapper:first-child {
@@ -230,37 +193,24 @@
 
 @media (max-width: 375px) {
   .hand-area {
-    padding: 8px 4px;
+    padding: 6px 4px;
   }
 
   .hand-columns {
-    gap: 10px;
+    gap: 8px;
+  }
+
+  .hand-column {
+    gap: 3px;
+    min-width: 60px;
   }
 
   .suit-group {
-    padding: 4px 6px;
-    border-radius: 8px;
-  }
-
-  .suit-header {
-    gap: 4px;
-  }
-
-  .suit-symbol {
-    font-size: 0.95em;
-  }
-
-  .suit-name {
-    font-size: 0.65em;
-  }
-
-  .suit-count {
-    font-size: 0.55em;
-    padding: 1px 4px;
+    min-height: 78px;
   }
 
   .hand-card-wrapper {
-    margin-left: -22px;
+    margin-left: -20px;
   }
 
   .turn-badge {
@@ -272,46 +222,42 @@
 
 @media (min-width: 376px) and (max-width: 480px) {
   .hand-columns {
-    gap: 14px;
+    gap: 12px;
+  }
+
+  .hand-column {
+    min-width: 70px;
+  }
+
+  .suit-group {
+    min-height: 86px;
   }
 
   .hand-card-wrapper {
-    margin-left: -20px;
+    margin-left: -18px;
   }
 }
 
 @media (min-width: 481px) {
   .hand-area {
-    padding: 15px 12px;
+    padding: 12px 12px;
   }
 
   .hand-columns {
-    gap: 24px;
+    gap: 20px;
+  }
+
+  .hand-column {
+    gap: 6px;
+    min-width: 100px;
   }
 
   .suit-group {
-    padding: 8px 12px;
-  }
-
-  .suit-header {
-    gap: 8px;
-  }
-
-  .suit-symbol {
-    font-size: 1.3em;
-  }
-
-  .suit-name {
-    font-size: 0.85em;
-  }
-
-  .suit-count {
-    font-size: 0.7em;
-    padding: 2px 8px;
+    min-height: 120px;
   }
 
   .hand-card-wrapper {
-    margin-left: -20px;
+    margin-left: -22px;
   }
 
   .hand-card-wrapper:hover {
@@ -329,35 +275,37 @@
   }
 }
 
-/* Landscape */
-@media (max-height: 500px) and (orientation: landscape) {
-  .hand-area {
-    padding: 6px 4px;
-  }
-
-  .hand-columns {
-    gap: 16px;
-  }
-
+@media (min-width: 769px) {
   .suit-group {
-    padding: 4px 6px;
-    gap: 2px;
-  }
-
-  .suit-header {
-    padding: 1px 2px;
-  }
-
-  .suit-symbol {
-    font-size: 0.9em;
-  }
-
-  .suit-name {
-    font-size: 0.6em;
+    min-height: 150px;
   }
 
   .hand-card-wrapper {
-    margin-left: -24px;
+    margin-left: -25px;
+  }
+}
+
+/* Landscape */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hand-area {
+    padding: 4px 4px;
+  }
+
+  .hand-columns {
+    gap: 12px;
+  }
+
+  .hand-column {
+    gap: 2px;
+    min-width: 60px;
+  }
+
+  .suit-group {
+    min-height: 78px;
+  }
+
+  .hand-card-wrapper {
+    margin-left: -22px;
   }
 
   .hand-card-wrapper:hover {

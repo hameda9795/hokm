@@ -17,6 +17,11 @@ interface GameStore {
   selectedCard: Card | null;
   showHokmSelector: boolean;
 
+  // Trick display state
+  showingTrickResult: boolean;
+  trickWinnerId: string | null;
+  pendingGameState: GameState | null;
+
   // Actions
   setConnected: (connected: boolean) => void;
   setPlayerId: (id: string) => void;
@@ -28,6 +33,8 @@ interface GameStore {
   setSelectedCard: (card: Card | null) => void;
   setShowHokmSelector: (show: boolean) => void;
   addPlayedCard: (playerId: string, card: Card) => void;
+  setTrickWinner: (winnerId: string) => void;
+  clearTrickDisplay: () => void;
   reset: () => void;
 }
 
@@ -40,7 +47,10 @@ const initialState = {
   isMyTurn: false,
   error: null,
   selectedCard: null,
-  showHokmSelector: false
+  showHokmSelector: false,
+  showingTrickResult: false,
+  trickWinnerId: null,
+  pendingGameState: null
 };
 
 export const useGameStore = create<GameStore>((set, get) => ({
@@ -51,6 +61,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
   setPlayerId: (id) => set({ playerId: id }),
 
   setGameState: (state) => {
+    const { showingTrickResult, gameState: currentState } = get();
+
+    // If we're showing trick result, queue the state update
+    if (showingTrickResult) {
+      set({ pendingGameState: state });
+      return;
+    }
+
+    // Check if a trick just completed (4 cards were on table, now cleared)
+    const hadFourCards = currentState?.currentTrick?.cards?.length === 4;
+    const newHasNoCards = state.currentTrick?.cards?.length === 0;
+
+    if (hadFourCards && newHasNoCards && state.phase === 'playing') {
+      // Trick just completed - delay the update
+      set({ pendingGameState: state, showingTrickResult: true });
+      return;
+    }
+
     set({ gameState: state });
 
     // اگر در فاز انتخاب حکم هستیم و من حاکم هستم
@@ -92,6 +120,39 @@ export const useGameStore = create<GameStore>((set, get) => ({
         myHand: myHand.filter(c => c.id !== card.id),
         selectedCard: null
       });
+    }
+  },
+
+  setTrickWinner: (winnerId) => {
+    set({ trickWinnerId: winnerId });
+  },
+
+  clearTrickDisplay: () => {
+    const { pendingGameState, playerId } = get();
+
+    if (pendingGameState) {
+      // Apply the pending state
+      set({
+        gameState: pendingGameState,
+        showingTrickResult: false,
+        trickWinnerId: null,
+        pendingGameState: null
+      });
+
+      // Update turn and hokm selector
+      if (pendingGameState.phase === 'choosingHokm' && pendingGameState.hakemId === playerId) {
+        set({ showHokmSelector: true });
+      } else {
+        set({ showHokmSelector: false });
+      }
+
+      if (pendingGameState.currentPlayerId === playerId && pendingGameState.phase === 'playing') {
+        set({ isMyTurn: true });
+      } else if (pendingGameState.phase !== 'playing') {
+        set({ isMyTurn: false });
+      }
+    } else {
+      set({ showingTrickResult: false, trickWinnerId: null });
     }
   },
 

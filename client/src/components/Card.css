@@ -99,16 +99,14 @@
   50% { opacity: 1; }
 }
 
-/* Disabled card */
+/* Disabled card - keep good contrast, just subtle indication */
 .card-disabled {
-  opacity: 0.4;
   cursor: not-allowed;
-  filter: grayscale(0.5) brightness(0.9);
-  transform: scale(0.98);
+  transform: scale(1);
 }
 
 .card-disabled:hover {
-  transform: scale(0.98);
+  transform: scale(1);
 }
 
 /* Playable card hover */
