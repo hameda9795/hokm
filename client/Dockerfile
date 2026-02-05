@@ -9,6 +9,10 @@ COPY tsconfig.json ./
 COPY tsconfig.node.json ./
 COPY vite.config.ts ./
 
+# Build arguments
+ARG VITE_SOCKET_URL
+ENV VITE_SOCKET_URL=$VITE_SOCKET_URL
+
 # Install dependencies
 RUN npm install
 

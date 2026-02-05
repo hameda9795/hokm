@@ -48,6 +48,8 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
+      args:
+        VITE_SOCKET_URL: ${VITE_SOCKET_URL:-https://hokm.maxhmd.dev}
     container_name: hokm-client
     restart: unless-stopped
     ports:
