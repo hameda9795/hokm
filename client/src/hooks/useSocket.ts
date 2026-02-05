@@ -85,6 +85,10 @@ export const useSocket = () => {
     socket.on('game:error', (message: string) => {
       setError(message);
       console.error('Game error:', message);
+      // اگر خطای بازی کارت بود، نوبت را برگردان
+      if (message.includes('خال') || message.includes('کارت') || message.includes('نوبت')) {
+        setIsMyTurn(true);
+      }
     });
 
     socket.on('game:playerJoined', (player: Player) => {

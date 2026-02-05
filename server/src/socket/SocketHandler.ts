@@ -497,21 +497,34 @@ export class SocketHandler {
 
           // بررسی پایان دست
           if (state.phase === 'roundEnd') {
+            console.log(`[Bot] Round ended! Score: ${state.roundScore.team1}-${state.roundScore.team2}`);
             this.io.to(gameId).emit('game:roundEnd', state.roundScore, state.gameScore);
             this.broadcastGameState(gameId);
 
             // شروع دست بعدی
+            console.log(`[Bot] Starting next round in 4 seconds...`);
             setTimeout(() => {
+              console.log(`[Bot] 4 seconds passed, starting next round`);
               const currentEngine2 = gameManager.getGame(gameId);
-              if (!currentEngine2) return;
+              if (!currentEngine2) {
+                console.log(`[Bot] ERROR: Engine not found after 4 seconds`);
+                return;
+              }
 
               const currentState = currentEngine2.getState();
-              if (currentState.phase !== 'roundEnd') return;
+              console.log(`[Bot] Current phase before startNextRound: ${currentState.phase}`);
+              if (currentState.phase !== 'roundEnd') {
+                console.log(`[Bot] Phase is not roundEnd, skipping`);
+                return;
+              }
 
               currentEngine2.startNextRound();
+              const newState = currentEngine2.getState();
+              console.log(`[Bot] After startNextRound - Phase: ${newState.phase}, HakemId: ${newState.hakemId}`);
               this.broadcastGameState(gameId);
 
               // انتخاب حکم توسط Bot اگر حاکم Bot است
+              console.log(`[Bot] Calling checkAndSelectHokm...`);
               this.checkAndSelectHokm(gameId);
             }, 4000);
 
@@ -542,32 +555,52 @@ export class SocketHandler {
    * بررسی و انتخاب خودکار حکم توسط Bot
    */
   private checkAndSelectHokm(gameId: string): void {
+    console.log(`[checkAndSelectHokm] Called for game ${gameId}`);
     const engine = gameManager.getGame(gameId);
-    if (!engine) return;
+    if (!engine) {
+      console.log(`[checkAndSelectHokm] No engine found for game ${gameId}`);
+      return;
+    }
+
+    const state = engine.getState();
+    console.log(`[checkAndSelectHokm] Phase: ${state.phase}, HakemId: ${state.hakemId}`);
 
     // اگر حاکم Bot است (بازیکن disconnect شده یا Bot)
-    if (engine.shouldBotSelectHokm()) {
+    const shouldSelect = engine.shouldBotSelectHokm();
+    console.log(`[checkAndSelectHokm] shouldBotSelectHokm: ${shouldSelect}`);
+
+    if (shouldSelect) {
+      console.log(`[checkAndSelectHokm] Bot will select hokm in 2 seconds...`);
       // تأخیر برای طبیعی‌تر شدن
       setTimeout(() => {
         const currentEngine = gameManager.getGame(gameId);
-        if (!currentEngine) return;
+        if (!currentEngine) {
+          console.log(`[checkAndSelectHokm] Engine gone after timeout`);
+          return;
+        }
 
+        console.log(`[checkAndSelectHokm] Calling botSelectHokm...`);
         const selectedHokm = currentEngine.botSelectHokm();
+        console.log(`[checkAndSelectHokm] Selected hokm: ${selectedHokm}`);
 
         if (selectedHokm) {
           this.io.to(gameId).emit('game:hokmSelected', selectedHokm);
-          console.log(`Bot selected hokm: ${selectedHokm}`);
+          console.log(`[checkAndSelectHokm] Bot selected hokm: ${selectedHokm}`);
 
           // ارسال state جدید
           this.broadcastGameState(gameId);
 
           const state = currentEngine.getState();
+          console.log(`[checkAndSelectHokm] After hokm - Phase: ${state.phase}, CurrentPlayer: ${state.currentPlayerId}`);
+
           if (state.currentPlayerId && state.phase === 'playing') {
             this.io.to(state.currentPlayerId).emit('game:yourTurn');
 
             // شروع بازی خودکار Bot
             this.checkAndPlayBot(gameId);
           }
+        } else {
+          console.log(`[checkAndSelectHokm] botSelectHokm returned null!`);
         }
       }, 2000);
     }
