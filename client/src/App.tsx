@@ -1,6 +1,7 @@
 import React from 'react';
 import { Game } from './components/Game';
 import { useTelegram } from './hooks/useTelegram';
+import CardSuitsSVG from './components/CardAssets';
 import './App.css';
 
 const App: React.FC = () => {
@@ -8,6 +9,8 @@ const App: React.FC = () => {
 
   return (
     <div className={`app ${colorScheme}`}>
+      {/* SVG definitions for card suits */}
+      <CardSuitsSVG />
       {isReady ? (
         <Game />
       ) : (
