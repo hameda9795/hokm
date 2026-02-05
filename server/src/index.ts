@@ -3,6 +3,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { webhookCallback } from 'grammy';
 import { SocketHandler } from './socket/SocketHandler.js';
 import { gameManager } from './game/GameManager.js';
 import { TelegramBot } from './bot/TelegramBot.js';
@@ -81,9 +82,22 @@ if (botToken && miniAppUrl) {
     miniAppUrl: miniAppUrl,
     gameManager
   });
-  telegramBot.start().catch(err => {
-    console.error('Failed to start Telegram bot:', err);
-  });
+
+  // Use Webhook in Production, Polling in Development
+  if (process.env.NODE_ENV === 'production') {
+    console.log('🚀 Starting Telegram Bot in WEBHOOK mode...');
+    // Setup webhook route
+    // Note: Nginx forwards /webhook/* to this server
+    app.use('/webhook/telegram', webhookCallback(telegramBot.getBot(), 'express'));
+
+    // Log webhook info
+    console.log(`📡 Webhook endpoint ready at /webhook/telegram`);
+  } else {
+    console.log('🔄 Starting Telegram Bot in POLLING mode...');
+    telegramBot.start().catch(err => {
+      console.error('Failed to start Telegram bot:', err);
+    });
+  }
 } else {
   console.warn('⚠️  Telegram bot not initialized. Set TELEGRAM_BOT_TOKEN and TELEGRAM_WEBHOOK_DOMAIN in .env file.');
 }
@@ -142,7 +156,7 @@ httpServer.listen(PORT, () => {
 ╠═══════════════════════════════════════╣
 ║  Port: ${PORT.toString().padEnd(33)} ║
 ║  Mode: ${(process.env.NODE_ENV || 'development').padEnd(33)} ║
-║  Bot:  ${telegramBot ? '✅ Active'.padEnd(33) : '❌ Disabled'.padEnd(33)} ║
+║  Bot:  ${telegramBot ? (process.env.NODE_ENV === 'production' ? '📡 Webhook' : '🔄 Polling').padEnd(33) : '❌ Disabled'.padEnd(33)} ║
 ╚═══════════════════════════════════════╝
   `);
 });
