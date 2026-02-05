@@ -326,9 +326,9 @@ export class SocketHandler {
         this.io.to(gameId).emit('game:cardPlayed', socket.id, playedCard);
       }
 
-      // بررسی اتمام trick
-      if (state.currentTrick.cards.length === 0 && prevState.currentTrick.cards.length === 4) {
-        const winnerId = prevState.currentTrick.winnerId || state.lastTrickWinner;
+      // بررسی اتمام trick (اگر قبل از بازی 3 کارت بود و الان 0 کارت است، یعنی کارت 4 بازی شد)
+      if (state.currentTrick.cards.length === 0 && prevState.currentTrick.cards.length === 3) {
+        const winnerId = state.lastTrickWinner;
         if (winnerId) {
           const winner = engine.getPlayer(winnerId);
           if (winner) {
@@ -458,14 +458,14 @@ export class SocketHandler {
         if (result.success && result.playerId && result.cardId) {
           const state = currentEngine.getState();
 
-          // یافتن کارت بازی شده از trick فعلی
-          const playedCardEntry = state.currentTrick.cards.find(
-            c => c.playerId === result.playerId && c.card.id === result.cardId
-          );
+          // یافتن کارت بازی شده از دست قبلی بازیکن (قبل از بازی)
+          const playedCard = prevState.players
+            .find(p => p.id === result.playerId)?.hand
+            .find(c => c.id === result.cardId);
 
-          if (playedCardEntry) {
-            this.io.to(gameId).emit('game:cardPlayed', result.playerId, playedCardEntry.card);
-            console.log(`Bot played card: ${playedCardEntry.card.rank} of ${playedCardEntry.card.suit}`);
+          if (playedCard) {
+            this.io.to(gameId).emit('game:cardPlayed', result.playerId, playedCard);
+            console.log(`Bot played card: ${playedCard.rank} of ${playedCard.suit}`);
           }
 
           // بررسی اتمام trick (از 4 کارت به 0 کارت)
