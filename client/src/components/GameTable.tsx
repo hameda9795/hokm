@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card } from './Card';
 import { Card as CardType, Player, Suit } from '../types';
+import { getPlayerAvatar } from '../utils/avatars';
 import './GameTable.css';
 
 interface GameTableProps {
@@ -9,6 +10,7 @@ interface GameTableProps {
   hokm: Suit | null;
   myPlayerId: string;
   hakemId: string | null;
+  currentPlayerId?: string | null;
 }
 
 export const GameTable: React.FC<GameTableProps> = ({
@@ -16,7 +18,8 @@ export const GameTable: React.FC<GameTableProps> = ({
   currentTrick,
   hokm: _hokm,
   myPlayerId,
-  hakemId
+  hakemId,
+  currentPlayerId
 }) => {
   const getRelativePosition = (playerPosition: number) => {
     const myPlayer = players.find(p => p.id === myPlayerId);
@@ -32,12 +35,9 @@ export const GameTable: React.FC<GameTableProps> = ({
     return currentTrick.find(t => t.playerId === playerId)?.card;
   };
 
-  // Calculate remaining cards for each player (13 - cards played)
+  // Calculate remaining cards for each player
   const getPlayerRemainingCards = (player: Player) => {
-    // Each player starts with 13 cards
-    // We count how many cards they've played in current trick
     const hasPlayedInTrick = currentTrick.some(t => t.playerId === player.id);
-    // For display purposes, show their hand count
     return player.hand?.length || (13 - (hasPlayedInTrick ? 1 : 0));
   };
 
@@ -62,7 +62,9 @@ export const GameTable: React.FC<GameTableProps> = ({
           const relPos = getRelativePosition(player.position);
           const isHakem = player.id === hakemId;
           const isMe = player.id === myPlayerId;
+          const isCurrentTurn = player.id === currentPlayerId;
           const remainingCards = getPlayerRemainingCards(player);
+          const avatarPath = getPlayerAvatar(player.id, player.position, player.isBot || false);
 
           return (
             <div key={player.id} className={`player-slot ${positionClasses[relPos]}`}>
@@ -82,15 +84,22 @@ export const GameTable: React.FC<GameTableProps> = ({
                 </div>
               )}
 
-              {/* Player info */}
-              <div className={`player-info ${isMe ? 'is-me' : ''}`}>
-                <div className={`player-chip ${player.isConnected ? '' : 'disconnected'} team-${player.team}`}>
-                  <span className="player-chip-letter">
-                    {player.name.charAt(0).toUpperCase()}
-                  </span>
-                  {isHakem && <span className="hakem-crown">H</span>}
+              {/* Player info with avatar */}
+              <div className={`player-info ${isMe ? 'is-me' : ''} ${isCurrentTurn ? 'is-turn' : ''}`}>
+                <div className={`player-avatar-wrapper ${player.isConnected ? '' : 'disconnected'} team-${player.team}`}>
+                  <img
+                    src={avatarPath}
+                    alt={player.name}
+                    className="player-avatar-img"
+                    draggable={false}
+                  />
+                  {isHakem && <span className="hakem-crown">👑</span>}
+                  {isCurrentTurn && <div className="turn-indicator" />}
                 </div>
-                <span className="player-name">{player.name}</span>
+                <span className="player-name">{isMe ? 'شما' : player.name}</span>
+                {!isMe && (
+                  <span className="player-cards-count">{remainingCards}</span>
+                )}
               </div>
             </div>
           );

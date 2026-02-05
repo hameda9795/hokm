@@ -177,12 +177,13 @@
   flex-direction: row-reverse;
 }
 
-/* Player info (chip + name) */
+/* Player info (avatar + name) */
 .player-info {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  transition: transform 0.3s ease;
 }
 
 .player-slot.left .player-info,
@@ -190,10 +191,15 @@
   flex-direction: column;
 }
 
-/* Player chip - Premium neon style */
-.player-chip {
-  width: 40px;
-  height: 40px;
+/* Turn indicator glow on player info */
+.player-info.is-turn {
+  transform: scale(1.05);
+}
+
+/* Player Avatar Wrapper - Premium Frame */
+.player-avatar-wrapper {
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -201,92 +207,119 @@
   position: relative;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: visible;
+  padding: 3px;
 }
 
-/* Team 1 - Gold theme */
-.player-chip.team-team1 {
+/* Team 1 - Gold frame */
+.player-avatar-wrapper.team-team1 {
   background: linear-gradient(145deg, #fbbf24, #f59e0b, #d97706);
-  border: 2px solid rgba(255, 255, 255, 0.3);
   box-shadow:
-    0 0 0 3px rgba(251, 191, 36, 0.3),
-    0 4px 15px rgba(251, 191, 36, 0.5),
-    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+    0 0 0 2px rgba(251, 191, 36, 0.4),
+    0 4px 15px rgba(251, 191, 36, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Team 2 - Pink/Magenta theme */
-.player-chip.team-team2 {
+/* Team 2 - Pink frame */
+.player-avatar-wrapper.team-team2 {
   background: linear-gradient(145deg, #f472b6, #ec4899, #db2777);
-  border: 2px solid rgba(255, 255, 255, 0.3);
   box-shadow:
-    0 0 0 3px rgba(244, 114, 182, 0.3),
-    0 4px 15px rgba(244, 114, 182, 0.5),
-    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+    0 0 0 2px rgba(244, 114, 182, 0.4),
+    0 4px 15px rgba(244, 114, 182, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-.player-chip.disconnected {
+.player-avatar-wrapper.disconnected {
   background: linear-gradient(145deg, #6b7280, #4b5563);
   opacity: 0.5;
-  filter: grayscale(0.6);
+  filter: grayscale(0.8);
 }
 
-.player-chip-letter {
-  color: white;
-  font-size: 1.1em;
-  font-weight: 800;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+/* Avatar image */
+.player-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #1a1a2e;
 }
 
 /* Hakem crown badge */
 .hakem-crown {
   position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: linear-gradient(145deg, #fcd34d, #f59e0b);
-  color: #78350f;
-  font-size: 10px;
-  font-weight: 900;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid #fef3c7;
-  box-shadow: 0 0 12px rgba(251, 191, 36, 0.6);
-  animation: crownShine 3s ease-in-out infinite;
+  top: -6px;
+  right: -6px;
+  font-size: 18px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  animation: crownBounce 2s ease-in-out infinite;
   z-index: 10;
 }
 
-@keyframes crownShine {
-
-  0%,
-  100% {
-    box-shadow: 0 0 12px rgba(251, 191, 36, 0.6);
+@keyframes crownBounce {
+  0%, 100% {
+    transform: translateY(0) rotate(-5deg);
   }
-
   50% {
-    box-shadow: 0 0 20px rgba(251, 191, 36, 0.9);
+    transform: translateY(-3px) rotate(5deg);
   }
 }
 
-/* Player name - full name display */
+/* Turn indicator ring */
+.turn-indicator {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 3px solid #10b981;
+  animation: turnPulse 1.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes turnPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.8);
+  }
+}
+
+/* Player name */
 .player-name {
   color: white;
-  font-size: 0.75em;
+  font-size: 0.72em;
   font-weight: 600;
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
   white-space: nowrap;
-  max-width: 80px;
+  max-width: 75px;
   overflow: hidden;
   text-overflow: ellipsis;
   padding: 3px 10px;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.7);
   border-radius: 12px;
   backdrop-filter: blur(4px);
 }
 
-/* Hide name for self (shown at bottom) */
-.player-info.is-me .player-name {
+/* Cards count badge */
+.player-cards-count {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: #fbbf24;
+  font-size: 0.65em;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 8px;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+/* Hide elements for self */
+.player-info.is-me .player-name,
+.player-info.is-me .player-cards-count {
   display: none;
 }
 
@@ -370,27 +403,27 @@
     height: 110px;
   }
 
-  .player-chip {
-    width: 34px;
-    height: 34px;
-  }
-
-  .player-chip-letter {
-    font-size: 0.95em;
+  .player-avatar-wrapper {
+    width: 42px;
+    height: 42px;
+    padding: 2px;
   }
 
   .hakem-crown {
-    width: 18px;
-    height: 18px;
-    font-size: 8px;
-    top: -6px;
-    right: -6px;
+    font-size: 14px;
+    top: -4px;
+    right: -4px;
   }
 
   .player-name {
-    font-size: 0.65em;
-    max-width: 65px;
-    padding: 2px 8px;
+    font-size: 0.62em;
+    max-width: 60px;
+    padding: 2px 6px;
+  }
+
+  .player-cards-count {
+    font-size: 0.55em;
+    padding: 1px 4px;
   }
 
   .card-back-mini {
@@ -420,18 +453,19 @@
     height: 150px;
   }
 
-  .player-chip {
-    width: 48px;
-    height: 48px;
+  .player-avatar-wrapper {
+    width: 60px;
+    height: 60px;
+    padding: 3px;
   }
 
-  .player-chip-letter {
-    font-size: 1.2em;
+  .hakem-crown {
+    font-size: 20px;
   }
 
   .player-name {
-    font-size: 0.85em;
-    max-width: 100px;
+    font-size: 0.8em;
+    max-width: 90px;
   }
 
   .card-back-mini {
@@ -452,15 +486,20 @@
     height: 100px;
   }
 
-  .player-chip {
-    width: 30px;
-    height: 30px;
+  .player-avatar-wrapper {
+    width: 36px;
+    height: 36px;
+    padding: 2px;
+  }
+
+  .hakem-crown {
+    font-size: 12px;
   }
 
   .player-name {
-    font-size: 0.6em;
-    padding: 2px 6px;
-    max-width: 55px;
+    font-size: 0.55em;
+    padding: 2px 5px;
+    max-width: 50px;
   }
 
   .card-back-mini {

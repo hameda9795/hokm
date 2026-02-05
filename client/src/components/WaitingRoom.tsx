@@ -1,5 +1,6 @@
 import React from 'react';
 import { Player, RoundsToWinOption } from '../types';
+import { getPlayerAvatar } from '../utils/avatars';
 import './WaitingRoom.css';
 
 interface WaitingRoomProps {
@@ -73,6 +74,9 @@ export const WaitingRoom: React.FC<WaitingRoomProps> = ({
           {[0, 1, 2, 3].map(position => {
             const player = players.find(p => p.position === position);
             const team = position % 2 === 0 ? 'team1' : 'team2';
+            const avatarPath = player
+              ? getPlayerAvatar(player.id, player.position, player.isBot || false)
+              : null;
 
             return (
               <div key={position} className={`wr-slot ${player ? 'wr-filled' : 'wr-empty'} wr-${team}`}>
@@ -81,15 +85,21 @@ export const WaitingRoom: React.FC<WaitingRoomProps> = ({
                 </div>
                 {player ? (
                   <>
-                    <div className={`wr-avatar ${player.isBot ? 'wr-bot-avatar' : ''}`}>
-                      {player.isBot ? '🤖' : player.name.charAt(0).toUpperCase()}
+                    <div className={`wr-avatar-wrapper wr-${team}-frame`}>
+                      <img
+                        src={avatarPath!}
+                        alt={player.name}
+                        className="wr-avatar-img"
+                        draggable={false}
+                      />
+                      {player.isBot && <span className="wr-bot-badge">🤖</span>}
                     </div>
                     <div className="wr-name">
                       {player.name}
                       {player.id === myPlayerId && <span className="wr-you"> (شما)</span>}
                     </div>
                     <div className={`wr-status ${player.isReady ? 'wr-ready' : 'wr-not-ready'}`}>
-                      {player.isReady ? 'آماده' : 'در انتظار'}
+                      {player.isReady ? '✓ آماده' : 'در انتظار...'}
                     </div>
                     {/* دکمه حذف ربات - فقط برای سازنده */}
                     {isCreator && player.isBot && (
@@ -106,7 +116,6 @@ export const WaitingRoom: React.FC<WaitingRoomProps> = ({
                     {/* دکمه اضافه کردن ربات - فقط برای سازنده */}
                     {canAddBot ? (
                       <button className="wr-add-bot-btn" onClick={() => {
-                        console.log('Add Bot button clicked');
                         onAddBot();
                       }}>
                         <span className="wr-add-bot-icon">🤖</span>
