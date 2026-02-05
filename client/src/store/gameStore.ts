@@ -90,15 +90,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
+    // If new trick started (server has cards but we're stuck with old cards), reset
+    // This handles the case when we missed the clearTrickDisplay
+    if (serverCardCount > 0 && serverCardCount < localTrickCards.length && state.phase === 'playing') {
+      console.log('[setGameState] New trick detected, clearing old cards');
+      set({ localTrickCards: [...state.currentTrick.cards] });
+    }
     // Sync local trick cards with server state when server has more cards
     // This handles the case when we miss a cardPlayed event
-    if (serverCardCount > localTrickCards.length && state.phase === 'playing') {
+    else if (serverCardCount > localTrickCards.length && state.phase === 'playing') {
       console.log('[setGameState] Syncing from server, server has more cards');
       set({ localTrickCards: [...state.currentTrick.cards] });
     }
-
-    // DON'T clear local trick cards here - let clearTrickDisplay handle it
-    // This was causing the 4th card to be lost when state arrives before cardPlayed event
 
     // Clear local trick cards when phase changes away from playing
     if (state.phase !== 'playing' && localTrickCards.length > 0) {

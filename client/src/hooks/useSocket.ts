@@ -56,6 +56,7 @@ export const useSocket = () => {
     });
 
     socket.on('game:cardPlayed', (playerId: string, card: Card) => {
+      console.log('[useSocket] Received game:cardPlayed:', playerId, card?.rank, card?.suit);
       addPlayedCard(playerId, card);
     });
 
