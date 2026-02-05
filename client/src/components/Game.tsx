@@ -38,7 +38,9 @@ export const Game: React.FC = () => {
     showHokmSelector,
     setSelectedCard,
     error,
-    setError
+    setError,
+    showingTrickResult,
+    displayedTrickCards
   } = useGameStore();
 
   // استفاده از ref برای جلوگیری از join/create دوباره
@@ -266,7 +268,9 @@ export const Game: React.FC = () => {
       <div className="game-middle">
         <GameTable
           players={gameState.players}
-          currentTrick={gameState.currentTrick.cards}
+          currentTrick={showingTrickResult && displayedTrickCards.length > 0
+            ? displayedTrickCards
+            : gameState.currentTrick.cards}
           hokm={gameState.hokm}
           myPlayerId={playerId}
           hakemId={gameState.hakemId}

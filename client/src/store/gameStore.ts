@@ -1,6 +1,11 @@
 import { create } from 'zustand';
 import { Card, GameState } from '../types';
 
+interface TrickCard {
+  playerId: string;
+  card: Card;
+}
+
 interface GameStore {
   // Connection
   isConnected: boolean;
@@ -17,9 +22,10 @@ interface GameStore {
   selectedCard: Card | null;
   showHokmSelector: boolean;
 
-  // Trick display state
+  // Trick display state - store cards separately for 3 second display
   showingTrickResult: boolean;
   trickWinnerId: string | null;
+  displayedTrickCards: TrickCard[];
   pendingGameState: GameState | null;
 
   // Actions
@@ -41,16 +47,17 @@ interface GameStore {
 const initialState = {
   isConnected: false,
   playerId: '',
-  gameState: null,
-  myHand: [],
-  hakemCards: [],
+  gameState: null as GameState | null,
+  myHand: [] as Card[],
+  hakemCards: [] as Card[],
   isMyTurn: false,
-  error: null,
-  selectedCard: null,
+  error: null as string | null,
+  selectedCard: null as Card | null,
   showHokmSelector: false,
   showingTrickResult: false,
-  trickWinnerId: null,
-  pendingGameState: null
+  trickWinnerId: null as string | null,
+  displayedTrickCards: [] as TrickCard[],
+  pendingGameState: null as GameState | null
 };
 
 export const useGameStore = create<GameStore>((set, get) => ({
@@ -61,22 +68,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
   setPlayerId: (id) => set({ playerId: id }),
 
   setGameState: (state) => {
-    const { showingTrickResult, gameState: currentState } = get();
+    const { showingTrickResult, displayedTrickCards } = get();
 
-    // If we're showing trick result, queue the state update
+    // If we're showing trick result, queue the state update but keep displayed cards
     if (showingTrickResult) {
       set({ pendingGameState: state });
       return;
     }
 
     // Check if this state has 4 cards (trick just completed)
-    const currentCardCount = currentState?.currentTrick?.cards?.length || 0;
     const newCardCount = state.currentTrick?.cards?.length || 0;
 
-    // When 4th card arrives - show it and start the delay
-    if (newCardCount === 4 && currentCardCount < 4 && state.phase === 'playing') {
-      // Show the 4 cards first
-      set({ gameState: state, showingTrickResult: true });
+    // When 4th card arrives - store cards separately and start the delay
+    if (newCardCount === 4 && state.phase === 'playing') {
+      // Store the 4 cards for display
+      const cardsToDisplay = [...state.currentTrick.cards];
+
+      set({
+        gameState: state,
+        showingTrickResult: true,
+        displayedTrickCards: cardsToDisplay
+      });
 
       // Start 3 second timer
       setTimeout(() => {
@@ -85,8 +97,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // If we already have 4 cards shown and new state has fewer/no cards, queue it
-    if (currentCardCount === 4 && newCardCount < 4) {
+    // If we have displayed cards (showing result), keep them and queue new state
+    if (displayedTrickCards.length === 4) {
       set({ pendingGameState: state });
       return;
     }
@@ -136,18 +148,45 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   setTrickWinner: (winnerId) => {
-    set({ trickWinnerId: winnerId });
+    const { gameState, showingTrickResult } = get();
+
+    // If we already have 4 cards displayed, just set the winner
+    if (showingTrickResult) {
+      set({ trickWinnerId: winnerId });
+      return;
+    }
+
+    // If trick won but we don't have cards displayed yet, store current trick cards
+    if (gameState?.currentTrick?.cards?.length === 4) {
+      set({
+        trickWinnerId: winnerId,
+        showingTrickResult: true,
+        displayedTrickCards: [...gameState.currentTrick.cards]
+      });
+
+      // Start 3 second timer
+      setTimeout(() => {
+        get().clearTrickDisplay();
+      }, 3000);
+    } else {
+      set({ trickWinnerId: winnerId });
+    }
   },
 
   clearTrickDisplay: () => {
     const { pendingGameState, playerId } = get();
 
+    // Clear displayed cards and apply pending state
+    set({
+      showingTrickResult: false,
+      trickWinnerId: null,
+      displayedTrickCards: []
+    });
+
     if (pendingGameState) {
       // Apply the pending state
       set({
         gameState: pendingGameState,
-        showingTrickResult: false,
-        trickWinnerId: null,
         pendingGameState: null
       });
 
@@ -163,8 +202,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       } else if (pendingGameState.phase !== 'playing') {
         set({ isMyTurn: false });
       }
-    } else {
-      set({ showingTrickResult: false, trickWinnerId: null });
     }
   },
 
