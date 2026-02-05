@@ -35,12 +35,6 @@ export const GameTable: React.FC<GameTableProps> = ({
     return currentTrick.find(t => t.playerId === playerId)?.card;
   };
 
-  // Calculate remaining cards for each player
-  const getPlayerRemainingCards = (player: Player) => {
-    const hasPlayedInTrick = currentTrick.some(t => t.playerId === player.id);
-    return player.hand?.length || (13 - (hasPlayedInTrick ? 1 : 0));
-  };
-
   return (
     <div className="game-table">
       <div className="table-felt">
@@ -57,33 +51,16 @@ export const GameTable: React.FC<GameTableProps> = ({
           })}
         </div>
 
-        {/* Player labels around the table with face-down cards */}
+        {/* Player labels around the table */}
         {players.map(player => {
           const relPos = getRelativePosition(player.position);
           const isHakem = player.id === hakemId;
           const isMe = player.id === myPlayerId;
           const isCurrentTurn = player.id === currentPlayerId;
-          const remainingCards = getPlayerRemainingCards(player);
           const avatarPath = getPlayerAvatar(player.id, player.position, player.isBot || false);
 
           return (
             <div key={player.id} className={`player-slot ${positionClasses[relPos]}`}>
-              {/* Face-down cards for other players */}
-              {!isMe && (
-                <div className={`player-cards-back ${positionClasses[relPos]}`}>
-                  {Array.from({ length: Math.min(remainingCards, 13) }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="card-back-mini"
-                      style={{
-                        '--card-index': i,
-                        '--total-cards': remainingCards
-                      } as React.CSSProperties}
-                    />
-                  ))}
-                </div>
-              )}
-
               {/* Player info with avatar */}
               <div className={`player-info ${isMe ? 'is-me' : ''} ${isCurrentTurn ? 'is-turn' : ''}`}>
                 <div className={`player-avatar-wrapper ${player.isConnected ? '' : 'disconnected'} team-${player.team}`}>
@@ -97,9 +74,6 @@ export const GameTable: React.FC<GameTableProps> = ({
                   {isCurrentTurn && <div className="turn-indicator" />}
                 </div>
                 <span className="player-name">{isMe ? 'شما' : player.name}</span>
-                {!isMe && (
-                  <span className="player-cards-count">{remainingCards}</span>
-                )}
               </div>
             </div>
           );

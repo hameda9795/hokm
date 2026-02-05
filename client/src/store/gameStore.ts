@@ -69,13 +69,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // Check if a trick just completed (4 cards were on table, now cleared)
-    const hadFourCards = currentState?.currentTrick?.cards?.length === 4;
-    const newHasNoCards = state.currentTrick?.cards?.length === 0;
+    // Check if this state has 4 cards (trick just completed)
+    const currentCardCount = currentState?.currentTrick?.cards?.length || 0;
+    const newCardCount = state.currentTrick?.cards?.length || 0;
 
-    if (hadFourCards && newHasNoCards && state.phase === 'playing') {
-      // Trick just completed - delay the update
-      set({ pendingGameState: state, showingTrickResult: true });
+    // When 4th card arrives - show it and start the delay
+    if (newCardCount === 4 && currentCardCount < 4 && state.phase === 'playing') {
+      // Show the 4 cards first
+      set({ gameState: state, showingTrickResult: true });
+
+      // Start 3 second timer
+      setTimeout(() => {
+        get().clearTrickDisplay();
+      }, 3000);
+      return;
+    }
+
+    // If we already have 4 cards shown and new state has fewer/no cards, queue it
+    if (currentCardCount === 4 && newCardCount < 4) {
+      set({ pendingGameState: state });
       return;
     }
 

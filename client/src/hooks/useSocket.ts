@@ -17,8 +17,7 @@ export const useSocket = () => {
     addPlayedCard,
     setConnected,
     setPlayerId,
-    setTrickWinner,
-    clearTrickDisplay
+    setTrickWinner
   } = useGameStore();
 
   useEffect(() => {
@@ -71,11 +70,7 @@ export const useSocket = () => {
     socket.on('game:trickWon', (winnerId: string, team: TeamId) => {
       console.log('Trick won by:', winnerId, 'Team:', team);
       setTrickWinner(winnerId);
-
-      // Wait 3 seconds before clearing the trick display
-      setTimeout(() => {
-        clearTrickDisplay();
-      }, 3000);
+      // Timer is managed in gameStore.setGameState
     });
 
     socket.on('game:roundEnd', (roundScore: RoundScore, gameScore: GameScore) => {
