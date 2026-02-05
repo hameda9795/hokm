@@ -368,6 +368,8 @@ export class SocketHandler {
             const newState = currentEngine.getState();
             if (newState.phase === 'choosingHokm' && newState.hakemId) {
               this.io.to(newState.hakemId).emit('player:hakemCards', newState.hakemCards);
+              // انتخاب حکم توسط Bot اگر حاکم Bot است
+              this.checkAndSelectHokm(gameId);
             }
           }, 4000);
         }
