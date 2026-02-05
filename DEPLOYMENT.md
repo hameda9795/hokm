@@ -72,7 +72,7 @@ sudo chown $USER:$USER /opt/hokm
 
 # Clone the repository
 cd /opt/hokm
-git clone https://github.com/YOUR_USERNAME/hokm-game.git .
+git clone https://github.com/hameda9795/hokm.git .
 
 # Or if you already have it, just pull
 git pull origin main

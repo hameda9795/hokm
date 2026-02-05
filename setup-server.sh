@@ -64,7 +64,8 @@ echo -e "${GREEN}✓${NC} Project directory created at $PROJECT_DIR"
 
 # Get user input
 echo -e "\n${YELLOW}Please provide the following information:${NC}"
-read -p "🔗 GitHub repository URL: " REPO_URL
+read -p "🔗 GitHub repository URL [https://github.com/hameda9795/hokm.git]: " REPO_URL
+REPO_URL=${REPO_URL:-https://github.com/hameda9795/hokm.git}
 read -p "🤖 Telegram Bot Token: " BOT_TOKEN
 
 # Clone or pull repository

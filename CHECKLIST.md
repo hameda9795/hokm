@@ -35,7 +35,7 @@
 ssh root@YOUR_SERVER_IP
 
 # دانلود و اجرای اسکریپت setup
-curl -O https://raw.githubusercontent.com/YOUR_USERNAME/hokm-game/main/setup-server.sh
+curl -O https://raw.githubusercontent.com/hameda9795/hokm/main/setup-server.sh
 chmod +x setup-server.sh
 sudo ./setup-server.sh
 ```
@@ -218,6 +218,6 @@ docker-compose run --rm certbot certonly \
 
 - 📖 [DEPLOYMENT.md](./DEPLOYMENT.md) - راهنمای مفصل
 - 📖 [README.md](./README.md) - مستندات پروژه
-- 🐛 [GitHub Issues](https://github.com/YOUR_USERNAME/hokm-game/issues)
+- 🐛 [GitHub Issues](https://github.com/hameda9795/hokm/issues)
 
 موفق باشید! 🚀

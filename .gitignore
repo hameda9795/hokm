@@ -55,3 +55,8 @@ tunnel_*.txt
 nul
 *.png
 
+# Webhook setup scripts (contain sensitive tokens)
+setup-webhook.sh
+setup-webhook.ps1
+
+

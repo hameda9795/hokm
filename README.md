@@ -49,8 +49,8 @@
 
 ```bash
 # Clone repository
-git clone https://github.com/YOUR_USERNAME/hokm-game.git
-cd hokm-game
+git clone https://github.com/hameda9795/hokm.git
+cd hokm
 
 # نصب dependencies
 npm run install:all
@@ -75,7 +75,7 @@ npm run dev
 
 ```bash
 # روی سرور Hetzner
-curl -O https://raw.githubusercontent.com/YOUR_USERNAME/hokm-game/main/setup-server.sh
+curl -O https://raw.githubusercontent.com/hameda9795/hokm/main/setup-server.sh
 chmod +x setup-server.sh
 sudo ./setup-server.sh
 ```
@@ -204,7 +204,7 @@ MIT
 ## 📞 پشتیبانی
 
 اگر مشکلی داشتید:
-1. [Issues](https://github.com/YOUR_USERNAME/hokm-game/issues) را بررسی کنید
+1. [Issues](https://github.com/hameda9795/hokm/issues) را بررسی کنید
 2. [راهنمای DEPLOYMENT.md](./DEPLOYMENT.md) را مطالعه کنید
 3. یک Issue جدید باز کنید
 
