@@ -314,23 +314,29 @@ export class SocketHandler {
 
     const { gameId, engine } = playerGame;
     const prevState = engine.getState();
+    const prevTrickLength = prevState.currentTrick.cards.length;
+
+    // ذخیره کارت‌های دست بازیکن (deep copy) قبل از بازی
+    const playerHand = prevState.players
+      .find(p => p.id === socket.id)?.hand.map(c => ({...c})) || [];
+
     const result = engine.playCard(socket.id, cardId);
 
     if (result.success) {
       const state = engine.getState();
-      const playedCard = prevState.players
-        .find(p => p.id === socket.id)?.hand
-        .find(c => c.id === cardId);
+
+      // یافتن کارت بازی شده از دست ذخیره شده
+      const playedCard = playerHand.find(c => c.id === cardId);
 
       if (playedCard) {
-        console.log(`[Human] Emitting cardPlayed: ${playedCard.rank} of ${playedCard.suit}, prevTrickLength: ${prevState.currentTrick.cards.length}`);
+        console.log(`[Human] Emitting cardPlayed: ${playedCard.rank} of ${playedCard.suit}, prevTrickLength: ${prevTrickLength}`);
         this.io.to(gameId).emit('game:cardPlayed', socket.id, playedCard);
       } else {
-        console.log(`[Human] ERROR: Could not find played card ${cardId} in prevState`);
+        console.log(`[Human] ERROR: Could not find played card ${cardId} in saved hand`);
       }
 
       // بررسی اتمام trick (اگر قبل از بازی 3 کارت بود و الان 0 کارت است، یعنی کارت 4 بازی شد)
-      if (state.currentTrick.cards.length === 0 && prevState.currentTrick.cards.length === 3) {
+      if (state.currentTrick.cards.length === 0 && prevTrickLength === 3) {
         console.log(`[Human] Trick completed! Emitting trickWon`);
         const winnerId = state.lastTrickWinner;
         if (winnerId) {
@@ -453,23 +459,29 @@ export class SocketHandler {
         const currentEngine = gameManager.getGame(gameId);
         if (!currentEngine) return;
 
-        // ذخیره state قبل از بازی
+        // ذخیره اطلاعات قبل از بازی
         const prevState = currentEngine.getState();
         const prevTrickLength = prevState.currentTrick.cards.length;
+        const currentPlayerId = prevState.currentPlayerId;
+
+        // ذخیره کارت‌های دست بازیکن فعلی (deep copy)
+        const currentPlayerHand = currentPlayerId
+          ? prevState.players.find(p => p.id === currentPlayerId)?.hand.map(c => ({...c})) || []
+          : [];
 
         const result = currentEngine.botPlayCard();
 
         if (result.success && result.playerId && result.cardId) {
           const state = currentEngine.getState();
 
-          // یافتن کارت بازی شده از دست قبلی بازیکن (قبل از بازی)
-          const playedCard = prevState.players
-            .find(p => p.id === result.playerId)?.hand
-            .find(c => c.id === result.cardId);
+          // یافتن کارت بازی شده از دست ذخیره شده
+          const playedCard = currentPlayerHand.find(c => c.id === result.cardId);
 
           if (playedCard) {
             this.io.to(gameId).emit('game:cardPlayed', result.playerId, playedCard);
-            console.log(`Bot played card: ${playedCard.rank} of ${playedCard.suit}`);
+            console.log(`[Bot] Emitting cardPlayed: ${playedCard.rank} of ${playedCard.suit}, prevTrickLength: ${prevTrickLength}`);
+          } else {
+            console.log(`[Bot] ERROR: Could not find card ${result.cardId} in saved hand`);
           }
 
           // بررسی اتمام trick (از 4 کارت به 0 کارت)
