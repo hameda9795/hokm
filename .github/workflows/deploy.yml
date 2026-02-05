@@ -60,8 +60,30 @@ jobs:
             
             # Check if services are running
             if docker-compose ps | grep -q "Up"; then
-              echo "✅ Deployment successful!"
-              echo "📦 Commit: ${GITHUB_SHA:0:7}"
+              echo "✅ Services are running"
+            else
+              echo "❌ Services failed to start"
+              docker-compose logs --tail=50
+              exit 1
+            fi
+
+            # Update Nginx Configuration
+            echo "🔧 Updating Nginx configuration..."
+            cp nginx-system-config.conf /etc/nginx/sites-available/hokm.conf
+            ln -sf /etc/nginx/sites-available/hokm.conf /etc/nginx/sites-enabled/
+            
+            # Test and Reload Nginx
+            if nginx -t; then
+              echo "✅ Nginx configuration valid"
+              systemctl reload nginx
+              echo "🔄 Nginx reloaded"
+            else
+              echo "❌ Invalid Nginx configuration"
+              exit 1
+            fi
+
+            echo "✅ Deployment successful!"
+            echo "📦 Commit: ${GITHUB_SHA:0:7}"
               echo "⏰ Time: $(date +'%Y-%m-%d %H:%M:%S')"
             else
               echo "❌ Deployment failed - services not running"
