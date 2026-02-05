@@ -215,18 +215,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   clearTrickDisplay: () => {
     const { pendingGameState, playerId } = get();
+    console.log('[clearTrickDisplay] pendingGameState cards:', pendingGameState?.currentTrick?.cards?.length || 0);
 
-    // Clear displayed cards and local trick cards, apply pending state
+    // Clear displayed cards
     set({
       showingTrickResult: false,
       trickWinnerId: null,
-      displayedTrickCards: [],
-      localTrickCards: []
+      displayedTrickCards: []
     });
 
     if (pendingGameState) {
-      // Apply the pending state
+      // Sync localTrickCards from pending state (cards that arrived during 3-second display)
+      const pendingCards = pendingGameState.currentTrick?.cards || [];
+      console.log('[clearTrickDisplay] Syncing localTrickCards from pending:', pendingCards.length);
       set({
+        localTrickCards: [...pendingCards],
         gameState: pendingGameState,
         pendingGameState: null
       });
@@ -243,6 +246,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       } else if (pendingGameState.phase !== 'playing') {
         set({ isMyTurn: false });
       }
+    } else {
+      // No pending state, just clear local cards
+      set({ localTrickCards: [] });
     }
   },
 
