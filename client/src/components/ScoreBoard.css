@@ -1,0 +1,254 @@
+/* ============================================
+   Game Header - Premium Branding 2026
+   Logo Center + Score Boxes Left/Right
+   ============================================ */
+
+.game-header {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 12px;
+  padding-top: calc(8px + env(safe-area-inset-top, 0px));
+  background: linear-gradient(180deg,
+      rgba(0, 0, 0, 0.7) 0%,
+      rgba(0, 0, 0, 0.4) 60%,
+      transparent 100%);
+  position: relative;
+  z-index: 100;
+}
+
+.header-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-left,
+.header-right {
+  flex: 1;
+  max-width: 120px;
+}
+
+.header-center {
+  flex: 2;
+  flex-direction: column;
+  text-align: center;
+  padding: 0 8px;
+}
+
+/* Game Title - Branding */
+.game-title {
+  font-size: 1.3em;
+  font-weight: 800;
+  margin: 0;
+  background: linear-gradient(145deg, #fcd34d, #f59e0b, #d97706);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 30px rgba(251, 191, 36, 0.3);
+  font-family: 'Georgia', serif;
+  letter-spacing: 1px;
+}
+
+.game-subtitle {
+  font-size: 0.7em;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 2px 0 0 0;
+  font-weight: 500;
+}
+
+/* Hokm display under title */
+.hokm-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 4px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.hokm-label {
+  font-size: 0.65em;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+}
+
+.hokm-suit {
+  font-size: 1.2em;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+/* Score Boxes */
+.score-box {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 85px;
+}
+
+.score-label {
+  font-size: 0.55em;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.score-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.my-score {
+  font-size: 1.4em;
+  font-weight: 800;
+  color: #34d399;
+  text-shadow: 0 0 15px rgba(52, 211, 153, 0.5);
+  min-width: 20px;
+  text-align: center;
+}
+
+.opponent-score {
+  font-size: 1.4em;
+  font-weight: 800;
+  color: #f87171;
+  text-shadow: 0 0 15px rgba(248, 113, 113, 0.5);
+  min-width: 20px;
+  text-align: center;
+}
+
+.score-separator {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 1em;
+  font-weight: 300;
+}
+
+.score-teams {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 4px;
+}
+
+.team-label {
+  font-size: 0.5em;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 500;
+}
+
+/* Round score box - left */
+.round-score {
+  border-color: rgba(52, 211, 153, 0.2);
+}
+
+/* Game score box - right */
+.game-score {
+  border-color: rgba(251, 191, 36, 0.2);
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+
+@media (max-width: 375px) {
+  .game-header {
+    padding: 6px 8px;
+  }
+
+  .header-left,
+  .header-right {
+    max-width: 100px;
+  }
+
+  .score-box {
+    padding: 6px 8px;
+    min-width: 75px;
+    border-radius: 10px;
+  }
+
+  .game-title {
+    font-size: 1.1em;
+  }
+
+  .game-subtitle {
+    font-size: 0.6em;
+  }
+
+  .my-score,
+  .opponent-score {
+    font-size: 1.2em;
+  }
+
+  .score-label {
+    font-size: 0.5em;
+  }
+}
+
+@media (min-width: 481px) {
+  .game-header {
+    padding: 12px 20px;
+  }
+
+  .header-left,
+  .header-right {
+    max-width: 150px;
+  }
+
+  .score-box {
+    padding: 10px 16px;
+    min-width: 110px;
+  }
+
+  .game-title {
+    font-size: 1.6em;
+  }
+
+  .game-subtitle {
+    font-size: 0.8em;
+  }
+
+  .my-score,
+  .opponent-score {
+    font-size: 1.6em;
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .game-header {
+    padding: 4px 10px;
+  }
+
+  .score-box {
+    padding: 4px 8px;
+    min-width: 70px;
+  }
+
+  .game-title {
+    font-size: 1em;
+  }
+
+  .game-subtitle {
+    display: none;
+  }
+
+  .hokm-display {
+    padding: 2px 8px;
+    margin-top: 2px;
+  }
+
+  .my-score,
+  .opponent-score {
+    font-size: 1.1em;
+  }
+}

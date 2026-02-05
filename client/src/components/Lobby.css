@@ -1,0 +1,403 @@
+/* ============================================
+   Lobby - Luxury Gold Theme 2026
+   Glass Morphism + Warm Gradients + Premium Feel
+   ============================================ */
+
+.lobby {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Animated luxury background effects */
+.lobby::before,
+.lobby::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.4;
+  animation: orbFloat 15s ease-in-out infinite;
+}
+
+.lobby::before {
+  width: 500px;
+  height: 500px;
+  background:
+    radial-gradient(circle, rgba(251, 191, 36, 0.6), rgba(245, 158, 11, 0.3), transparent 70%);
+  top: -200px;
+  left: -150px;
+}
+
+.lobby::after {
+  width: 450px;
+  height: 450px;
+  background:
+    radial-gradient(circle, rgba(244, 114, 182, 0.5), rgba(236, 72, 153, 0.3), transparent 70%);
+  bottom: -180px;
+  right: -150px;
+  animation-delay: -7.5s;
+}
+
+@keyframes orbFloat {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.4;
+  }
+
+  33% {
+    transform: translate(50px, -50px) scale(1.15);
+    opacity: 0.5;
+  }
+
+  66% {
+    transform: translate(-30px, 30px) scale(0.9);
+    opacity: 0.35;
+  }
+}
+
+/* Third decorative orb */
+.lobby .lobby-content::before {
+  content: '';
+  position: fixed;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.4), transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  filter: blur(100px);
+  pointer-events: none;
+  z-index: -1;
+  animation: centerPulse 8s ease-in-out infinite;
+}
+
+@keyframes centerPulse {
+
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+.lobby-content {
+  background:
+    linear-gradient(145deg, rgba(251, 191, 36, 0.06), rgba(244, 114, 182, 0.03)),
+    rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-radius: 36px;
+  padding: 48px 32px;
+  width: 100%;
+  max-width: 420px;
+  border: 1px solid rgba(251, 191, 36, 0.12);
+  box-shadow:
+    0 40px 80px rgba(0, 0, 0, 0.45),
+    0 0 80px rgba(251, 191, 36, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  position: relative;
+  z-index: 1;
+}
+
+/* Golden accent line at top */
+.lobby-content::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #fbbf24, #f59e0b, transparent);
+  border-radius: 3px;
+  box-shadow: 0 0 25px rgba(251, 191, 36, 0.6);
+}
+
+.lobby-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.lobby-header h1 {
+  color: white;
+  font-size: 2.4em;
+  margin: 0 0 10px 0;
+  font-weight: 800;
+  background: linear-gradient(145deg, #fef3c7, #fbbf24, #f59e0b, #d97706);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 40px rgba(251, 191, 36, 0.3);
+  position: relative;
+}
+
+/* Decorative sparkle */
+.lobby-header h1::before {
+  content: '✨';
+  position: absolute;
+  right: -10px;
+  top: -5px;
+  font-size: 0.4em;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+
+  50% {
+    opacity: 0.6;
+    transform: scale(0.8) rotate(15deg);
+  }
+}
+
+.lobby-header p {
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  font-size: 1.05em;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.lobby-menu,
+.lobby-create,
+.lobby-join {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Input - Premium glass style */
+.lobby-input {
+  background: rgba(0, 0, 0, 0.25);
+  border: 2px solid rgba(251, 191, 36, 0.15);
+  border-radius: 18px;
+  padding: 18px 22px;
+  font-size: 1.05em;
+  color: white;
+  text-align: center;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  direction: rtl;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.lobby-input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.lobby-input:focus {
+  outline: none;
+  border-color: rgba(251, 191, 36, 0.6);
+  background: rgba(251, 191, 36, 0.08);
+  box-shadow:
+    0 0 0 4px rgba(251, 191, 36, 0.12),
+    0 0 25px rgba(251, 191, 36, 0.15),
+    inset 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Buttons - Premium gradients */
+.lobby-button {
+  padding: 18px 28px;
+  border: none;
+  border-radius: 18px;
+  font-size: 1.1em;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Shimmer effect on buttons */
+.lobby-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.lobby-button:hover::before {
+  left: 100%;
+}
+
+/* Create button - Gold theme */
+.lobby-button.create {
+  background: linear-gradient(145deg, #fbbf24, #f59e0b, #d97706);
+  color: #78350f;
+  box-shadow:
+    0 0 0 3px rgba(251, 191, 36, 0.2),
+    0 8px 30px rgba(251, 191, 36, 0.4),
+    inset 0 2px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.lobby-button.create:active:not(:disabled) {
+  transform: scale(0.96);
+  box-shadow:
+    0 0 0 2px rgba(251, 191, 36, 0.3),
+    0 4px 15px rgba(251, 191, 36, 0.35);
+}
+
+.lobby-button.create:disabled {
+  background: linear-gradient(145deg, #a8a29e, #78716c);
+  color: #57534e;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Join button - Pink/Magenta theme */
+.lobby-button.join {
+  background: linear-gradient(145deg, #f472b6, #ec4899, #db2777);
+  color: white;
+  box-shadow:
+    0 0 0 3px rgba(244, 114, 182, 0.2),
+    0 8px 30px rgba(244, 114, 182, 0.4),
+    inset 0 2px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+}
+
+.lobby-button.join:active:not(:disabled) {
+  transform: scale(0.96);
+  box-shadow:
+    0 0 0 2px rgba(244, 114, 182, 0.3),
+    0 4px 15px rgba(244, 114, 182, 0.35);
+}
+
+.lobby-button.join:disabled {
+  background: linear-gradient(145deg, #a8a29e, #78716c);
+  color: #57534e;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Back button - Subtle glass */
+.lobby-button.back {
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.7);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+}
+
+.lobby-button.back:active {
+  background: rgba(255, 255, 255, 0.08);
+  transform: scale(0.96);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.lobby-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lobby-button:disabled::before {
+  display: none;
+}
+
+/* Info text */
+.create-info {
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  font-size: 0.95em;
+  line-height: 1.7;
+  padding: 0 10px;
+}
+
+/* Footer */
+.lobby-footer {
+  text-align: center;
+  margin-top: 32px;
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 0.8em;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+
+@media (max-width: 375px) {
+  .lobby {
+    padding: 16px;
+  }
+
+  .lobby-content {
+    padding: 36px 24px;
+    border-radius: 30px;
+  }
+
+  .lobby-header h1 {
+    font-size: 2em;
+  }
+
+  .lobby-button {
+    padding: 16px 22px;
+    font-size: 1em;
+    border-radius: 16px;
+  }
+
+  .lobby-input {
+    padding: 16px 18px;
+    border-radius: 16px;
+  }
+}
+
+@media (min-width: 481px) {
+  .lobby-content {
+    padding: 56px 40px;
+    max-width: 460px;
+  }
+
+  .lobby-header h1 {
+    font-size: 2.8em;
+  }
+
+  .lobby-button {
+    padding: 20px 32px;
+    font-size: 1.15em;
+  }
+}
+
+/* Desktop hover effects */
+@media (hover: hover) {
+  .lobby-button.create:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow:
+      0 0 0 4px rgba(251, 191, 36, 0.15),
+      0 12px 40px rgba(251, 191, 36, 0.5);
+  }
+
+  .lobby-button.join:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow:
+      0 0 0 4px rgba(244, 114, 182, 0.15),
+      0 12px 40px rgba(244, 114, 182, 0.5);
+  }
+
+  .lobby-button.back:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+}

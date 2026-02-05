@@ -1,0 +1,307 @@
+/* ============================================
+   Hokm Selector - Luxury Gold Modal 2026
+   Premium Glass + Warm Colors + Royal Feel
+   ============================================ */
+
+.hokm-selector-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(10, 10, 18, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: overlayFadeIn 0.5s ease;
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.hokm-selector {
+  background:
+    linear-gradient(145deg, rgba(251, 191, 36, 0.08), rgba(139, 92, 246, 0.05)),
+    rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  padding: 40px 28px;
+  border-radius: 32px;
+  text-align: center;
+  border: 1px solid rgba(251, 191, 36, 0.15);
+  box-shadow:
+    0 40px 80px rgba(0, 0, 0, 0.55),
+    0 0 100px rgba(251, 191, 36, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  animation: modalRoyalIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  width: calc(100% - 40px);
+  max-width: 380px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Top golden accent bar */
+.hokm-selector::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #fbbf24, #f59e0b, transparent);
+  border-radius: 4px;
+  box-shadow: 0 0 30px rgba(251, 191, 36, 0.7);
+}
+
+/* Decorative corner ornaments */
+.hokm-selector::after {
+  content: '';
+  position: absolute;
+  inset: 16px;
+  border: 1px solid rgba(251, 191, 36, 0.08);
+  border-radius: 24px;
+  pointer-events: none;
+}
+
+@keyframes modalRoyalIn {
+  from {
+    opacity: 0;
+    transform: translateY(60px) scale(0.85) rotateX(10deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotateX(0);
+  }
+}
+
+.hokm-title {
+  font-size: 1.8em;
+  font-weight: 800;
+  margin: 0 0 10px 0;
+  background: linear-gradient(145deg, #fef3c7, #fbbf24, #f59e0b, #d97706);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+  display: inline-block;
+}
+
+/* Crown decoration */
+.hokm-title::before {
+  content: '👑';
+  display: none;
+}
+
+.hokm-subtitle {
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0 0 28px 0;
+  font-size: 0.95em;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+/* نمایش 5 کارت حاکم */
+.hakem-preview-cards {
+  margin: 0 0 32px 0;
+  padding: 20px;
+  background: rgba(15, 15, 30, 0.4);
+  border-radius: 16px;
+  border: 1px solid rgba(251, 191, 36, 0.15);
+}
+
+.preview-label {
+  font-size: 0.85em;
+  color: #fbbf24;
+  margin: 0 0 12px 0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.preview-cards-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.suit-options {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+/* Suit button - Premium card style */
+.suit-button {
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.06), transparent 60%),
+    rgba(0, 0, 0, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 20px 12px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Radial glow on press/hover */
+.suit-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, var(--suit-color, transparent) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  border-radius: inherit;
+}
+
+/* Shimmer effect */
+.suit-button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  transition: left 0.6s ease;
+}
+
+.suit-button:active {
+  transform: scale(0.9);
+}
+
+.suit-button:active::before {
+  opacity: 0.2;
+}
+
+.suit-symbol {
+  font-size: 3em;
+  color: var(--suit-color);
+  filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.4));
+  position: relative;
+  z-index: 1;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.suit-name {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.85em;
+  font-weight: 600;
+  position: relative;
+  z-index: 1;
+  letter-spacing: 0.5px;
+}
+
+/* Desktop hover */
+@media (hover: hover) {
+  .suit-button:hover {
+    transform: translateY(-8px) scale(1.05);
+    border-color: var(--suit-color);
+    box-shadow:
+      0 0 0 3px rgba(var(--suit-color), 0.15),
+      0 15px 40px rgba(0, 0, 0, 0.35),
+      0 0 30px rgba(var(--suit-color), 0.2);
+  }
+
+  .suit-button:hover::before {
+    opacity: 0.15;
+  }
+
+  .suit-button:hover::after {
+    left: 100%;
+  }
+
+  .suit-button:hover .suit-symbol {
+    transform: scale(1.15) rotate(10deg);
+    filter: drop-shadow(0 6px 20px var(--suit-color));
+  }
+}
+
+/* Special glow per suit */
+.suit-button[style*="hearts"]::before,
+.suit-button[style*="diamonds"]::before {
+  background: radial-gradient(circle at center, rgba(220, 38, 38, 0.3) 0%, transparent 60%);
+}
+
+.suit-button[style*="clubs"]::before,
+.suit-button[style*="spades"]::before {
+  background: radial-gradient(circle at center, rgba(100, 116, 139, 0.3) 0%, transparent 60%);
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+
+@media (max-width: 375px) {
+  .hokm-selector {
+    padding: 32px 20px;
+    border-radius: 28px;
+  }
+
+  .hokm-title {
+    font-size: 1.5em;
+  }
+
+  .hokm-subtitle {
+    font-size: 0.88em;
+    margin-bottom: 22px;
+  }
+
+  .suit-symbol {
+    font-size: 2.5em;
+  }
+
+  .suit-button {
+    padding: 16px 10px;
+    border-radius: 16px;
+    gap: 8px;
+  }
+
+  .suit-name {
+    font-size: 0.75em;
+  }
+
+  .suit-options {
+    gap: 10px;
+  }
+}
+
+@media (min-width: 481px) {
+  .hokm-selector {
+    padding: 48px 36px;
+    max-width: 420px;
+  }
+
+  .hokm-title {
+    font-size: 2em;
+  }
+
+  .suit-symbol {
+    font-size: 3.5em;
+  }
+
+  .suit-button {
+    padding: 24px 16px;
+    border-radius: 22px;
+  }
+
+  .suit-options {
+    gap: 18px;
+  }
+}

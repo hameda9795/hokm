@@ -1,0 +1,478 @@
+/* ============================================
+   Game Table - Casino Green Felt 2026
+   Background Image + Face-down Cards + Full Names
+   ============================================ */
+
+.game-table {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 8px;
+}
+
+/* Premium table with golden border */
+.table-felt {
+  width: min(92vw, 440px);
+  aspect-ratio: 1.3 / 1;
+  max-height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Transparent with slight darkening */
+  background: radial-gradient(ellipse at 50% 50%,
+      rgba(0, 0, 0, 0.2) 0%,
+      rgba(0, 0, 0, 0.4) 100%);
+
+  border-radius: 50%;
+
+  /* Inner shadow for depth */
+  box-shadow:
+    inset 0 0 80px rgba(0, 0, 0, 0.3),
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Golden border ring */
+.table-felt::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 3px solid rgba(251, 191, 36, 0.4);
+  box-shadow:
+    0 0 20px rgba(251, 191, 36, 0.2),
+    inset 0 0 20px rgba(251, 191, 36, 0.1);
+  pointer-events: none;
+}
+
+/* Card slots in center */
+.table-center {
+  width: 160px;
+  height: 130px;
+  position: relative;
+  z-index: 10;
+}
+
+.table-card-slot {
+  position: absolute;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.6));
+}
+
+.table-card-slot.bottom {
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: cardSlideBottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.table-card-slot.top {
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: cardSlideTop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.table-card-slot.left {
+  left: -20px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-4deg);
+  animation: cardSlideLeft 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.table-card-slot.right {
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%) rotate(4deg);
+  animation: cardSlideRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes cardSlideBottom {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(50px) scale(0.7);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes cardSlideTop {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-50px) scale(0.7);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes cardSlideLeft {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(-50px) rotate(-4deg) scale(0.7);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0) rotate(-4deg) scale(1);
+  }
+}
+
+@keyframes cardSlideRight {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(50px) rotate(4deg) scale(0.7);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0) rotate(4deg) scale(1);
+  }
+}
+
+/* Player slots around table */
+.player-slot {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  z-index: 5;
+}
+
+.player-slot.bottom {
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.player-slot.top {
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  flex-direction: column-reverse;
+}
+
+.player-slot.left {
+  left: -15px;
+  top: 50%;
+  transform: translateY(-50%);
+  flex-direction: row;
+}
+
+.player-slot.right {
+  right: -15px;
+  top: 50%;
+  transform: translateY(-50%);
+  flex-direction: row-reverse;
+}
+
+/* Player info (chip + name) */
+.player-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.player-slot.left .player-info,
+.player-slot.right .player-info {
+  flex-direction: column;
+}
+
+/* Player chip - Premium neon style */
+.player-chip {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible;
+}
+
+/* Team 1 - Gold theme */
+.player-chip.team-team1 {
+  background: linear-gradient(145deg, #fbbf24, #f59e0b, #d97706);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 0 0 3px rgba(251, 191, 36, 0.3),
+    0 4px 15px rgba(251, 191, 36, 0.5),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Team 2 - Pink/Magenta theme */
+.player-chip.team-team2 {
+  background: linear-gradient(145deg, #f472b6, #ec4899, #db2777);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 0 0 3px rgba(244, 114, 182, 0.3),
+    0 4px 15px rgba(244, 114, 182, 0.5),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+}
+
+.player-chip.disconnected {
+  background: linear-gradient(145deg, #6b7280, #4b5563);
+  opacity: 0.5;
+  filter: grayscale(0.6);
+}
+
+.player-chip-letter {
+  color: white;
+  font-size: 1.1em;
+  font-weight: 800;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Hakem crown badge */
+.hakem-crown {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #fcd34d, #f59e0b);
+  color: #78350f;
+  font-size: 10px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fef3c7;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.6);
+  animation: crownShine 3s ease-in-out infinite;
+  z-index: 10;
+}
+
+@keyframes crownShine {
+
+  0%,
+  100% {
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.6);
+  }
+
+  50% {
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.9);
+  }
+}
+
+/* Player name - full name display */
+.player-name {
+  color: white;
+  font-size: 0.75em;
+  font-weight: 600;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+  white-space: nowrap;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 3px 10px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 12px;
+  backdrop-filter: blur(4px);
+}
+
+/* Hide name for self (shown at bottom) */
+.player-info.is-me .player-name {
+  display: none;
+}
+
+/* ============================================
+   Face-down cards for other players
+   ============================================ */
+
+.player-cards-back {
+  display: flex;
+  position: relative;
+  margin-bottom: 4px;
+}
+
+.player-slot.top .player-cards-back {
+  margin-bottom: 0;
+  margin-top: 4px;
+}
+
+.player-slot.left .player-cards-back,
+.player-slot.right .player-cards-back {
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+.player-slot.left .player-cards-back {
+  margin-right: 4px;
+}
+
+.player-slot.right .player-cards-back {
+  margin-left: 4px;
+}
+
+.card-back-mini {
+  width: 24px;
+  height: 34px;
+  background: linear-gradient(145deg, #1a1425, #0f0a15);
+  border-radius: 4px;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  position: relative;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Horizontal stacking for top/bottom */
+.player-cards-back.top .card-back-mini,
+.player-cards-back.bottom .card-back-mini {
+  margin-left: calc(var(--card-index) * -18px);
+}
+
+.player-cards-back.top .card-back-mini:first-child,
+.player-cards-back.bottom .card-back-mini:first-child {
+  margin-left: 0;
+}
+
+/* Vertical stacking for left/right */
+.player-cards-back.left .card-back-mini,
+.player-cards-back.right .card-back-mini {
+  margin-top: calc(var(--card-index) * -28px);
+}
+
+.player-cards-back.left .card-back-mini:first-child,
+.player-cards-back.right .card-back-mini:first-child {
+  margin-top: 0;
+}
+
+/* Card back pattern */
+.card-back-mini::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 2px;
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.1) 0%, transparent 60%),
+    repeating-linear-gradient(45deg, transparent 0px, transparent 4px, rgba(251, 191, 36, 0.05) 4px, rgba(251, 191, 36, 0.05) 5px);
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+
+@media (max-width: 375px) {
+  .table-felt {
+    width: 90vw;
+  }
+
+  .table-center {
+    width: 140px;
+    height: 110px;
+  }
+
+  .player-chip {
+    width: 34px;
+    height: 34px;
+  }
+
+  .player-chip-letter {
+    font-size: 0.95em;
+  }
+
+  .hakem-crown {
+    width: 18px;
+    height: 18px;
+    font-size: 8px;
+    top: -6px;
+    right: -6px;
+  }
+
+  .player-name {
+    font-size: 0.65em;
+    max-width: 65px;
+    padding: 2px 8px;
+  }
+
+  .card-back-mini {
+    width: 20px;
+    height: 28px;
+    border-radius: 3px;
+  }
+
+  .player-cards-back.top .card-back-mini,
+  .player-cards-back.bottom .card-back-mini {
+    margin-left: calc(var(--card-index) * -15px);
+  }
+
+  .player-cards-back.left .card-back-mini,
+  .player-cards-back.right .card-back-mini {
+    margin-top: calc(var(--card-index) * -22px);
+  }
+}
+
+@media (min-width: 481px) {
+  .table-felt {
+    width: min(80vw, 500px);
+  }
+
+  .table-center {
+    width: 180px;
+    height: 150px;
+  }
+
+  .player-chip {
+    width: 48px;
+    height: 48px;
+  }
+
+  .player-chip-letter {
+    font-size: 1.2em;
+  }
+
+  .player-name {
+    font-size: 0.85em;
+    max-width: 100px;
+  }
+
+  .card-back-mini {
+    width: 28px;
+    height: 40px;
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .table-felt {
+    width: auto;
+    height: 85%;
+    aspect-ratio: 1.3 / 1;
+  }
+
+  .table-center {
+    width: 120px;
+    height: 100px;
+  }
+
+  .player-chip {
+    width: 30px;
+    height: 30px;
+  }
+
+  .player-name {
+    font-size: 0.6em;
+    padding: 2px 6px;
+    max-width: 55px;
+  }
+
+  .card-back-mini {
+    width: 18px;
+    height: 26px;
+  }
+}

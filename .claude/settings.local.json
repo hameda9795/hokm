@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npx ngrok:*)",
+      "Bash(timeout:*)",
+      "Bash(ping:*)",
+      "Bash(cloudflared tunnel:*)",
+      "Bash(where.exe:*)",
+      "Bash(powershell.exe -Command \"Get-Command cloudflared -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source\")",
+      "Bash(powershell.exe -Command \"netstat -ano | Select-String '':3002''\")",
+      "Bash(powershell.exe -Command \"netstat -ano | Select-String '':3001''\")",
+      "Bash(powershell.exe -Command \"Stop-Process -Name cloudflared -Force -ErrorAction SilentlyContinue; Stop-Process -Name node -Force -ErrorAction SilentlyContinue; Write-Host ''Done''\")",
+      "Bash(d:/tmp/hokm/cloudflared.exe tunnel --url http://localhost:3000)",
+      "Bash(d:/tmp/hokm/cloudflared.exe tunnel --url http://localhost:3001)",
+      "Bash(npm run build:server:*)",
+      "Bash(npm run build:client:*)"
+    ]
+  }
+}

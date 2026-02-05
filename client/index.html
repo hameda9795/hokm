@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Viewport بهینه برای موبایل -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+
+    <!-- تنظیمات موبایل -->
+    <meta name="theme-color" content="#0a0f1a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <!-- جلوگیری از cache برای توسعه -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+
+    <meta name="description" content="بازی حکم آنلاین - بازی محبوب ایرانی" />
+    <meta name="keywords" content="حکم, بازی کارت, آنلاین, ایرانی, hokm" />
+
+    <!-- Open Graph برای اشتراک‌گذاری -->
+    <meta property="og:title" content="🃏 بازی حکم آنلاین" />
+    <meta property="og:description" content="بازی حکم آنلاین با دوستان" />
+    <meta property="og:type" content="website" />
+
+    <!-- Telegram Mini App Script -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <title>🃏 بازی حکم</title>
+
+    <style>
+      /* جلوگیری از FOUC و تنظیمات اولیه */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      html {
+        background: #0a0f1a;
+        /* Safe area برای نوچ */
+        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      }
+
+      body {
+        background: #0a0f1a;
+        min-height: 100vh;
+        min-height: 100dvh;
+        overflow-x: hidden;
+        /* جلوگیری از pull-to-refresh */
+        overscroll-behavior: none;
+      }
+
+      /* جلوگیری از انتخاب متن و zoom */
+      body {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+        touch-action: pan-x pan-y;
+      }
+
+      #root {
+        min-height: 100vh;
+        min-height: 100dvh;
+      }
+
+      /* صفحه لودینگ ساده */
+      .initial-loader {
+        position: fixed;
+        inset: 0;
+        background: #0a0f1a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+
+      .initial-loader::after {
+        content: '🃏';
+        font-size: 4em;
+        animation: pulse 1.5s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.8; }
+        50% { transform: scale(1.1); opacity: 1; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <!-- لودر اولیه تا React لود شود -->
+      <div class="initial-loader"></div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

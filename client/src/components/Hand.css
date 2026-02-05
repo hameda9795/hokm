@@ -1,0 +1,273 @@
+/* ============================================
+   Hand - Card Fan with Flexbox 2026
+   Reliable Layout + All Cards Visible
+   ============================================ */
+
+.hand-area {
+  position: relative;
+  width: 100%;
+  background:
+    linear-gradient(180deg,
+      transparent 0%,
+      rgba(8, 15, 25, 0.9) 25%,
+      rgba(5, 10, 18, 0.98) 100%);
+  border-top: 1px solid rgba(251, 191, 36, 0.2);
+  padding: 15px 0 10px;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Golden glow line */
+.hand-area::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 15%;
+  right: 15%;
+  height: 1px;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(251, 191, 36, 0.5),
+      rgba(251, 191, 36, 0.8),
+      rgba(251, 191, 36, 0.5),
+      transparent);
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.4);
+}
+
+/* Turn state */
+.hand-area.my-turn {
+  border-top-color: rgba(16, 185, 129, 0.4);
+}
+
+.hand-area.my-turn::after {
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(16, 185, 129, 0.6),
+      rgba(16, 185, 129, 1),
+      rgba(16, 185, 129, 0.6),
+      transparent);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+  animation: glowPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Turn badge */
+.turn-badge {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(145deg, #10b981, #059669);
+  color: white;
+  padding: 8px 24px;
+  border-radius: 25px;
+  font-size: 0.85em;
+  font-weight: 700;
+  box-shadow:
+    0 4px 20px rgba(16, 185, 129, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  z-index: 200;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  animation: badgeBounce 2s ease-in-out infinite;
+}
+
+@keyframes badgeBounce {
+
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  50% {
+    transform: translateX(-50%) translateY(-4px);
+  }
+}
+
+/* Scrollable container */
+.hand-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  padding: 50px 10px 15px;
+  scrollbar-width: none;
+}
+
+.hand-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Card row - Flexbox centered */
+.hand-cards {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  min-width: min-content;
+  padding: 0 15px;
+}
+
+/* Card wrapper */
+.hand-card-wrapper {
+  flex-shrink: 0;
+  margin: 0 -18px;
+  transform-origin: center 180%;
+  transition:
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter 0.3s ease,
+    margin 0.25s ease;
+  animation: cardSlideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.5));
+  cursor: pointer;
+}
+
+.hand-card-wrapper:first-child {
+  margin-left: 0;
+}
+
+.hand-card-wrapper:last-child {
+  margin-right: 0;
+}
+
+/* Hover - lift up */
+.hand-card-wrapper:hover {
+  transform: rotate(var(--r, 0deg)) translateY(-20px) scale(1.05);
+  filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.6));
+  z-index: 50 !important;
+  margin: 0 -10px;
+}
+
+.hand-card-wrapper:hover:first-child {
+  margin-left: 8px;
+}
+
+.hand-card-wrapper:hover:last-child {
+  margin-right: 8px;
+}
+
+/* Selected - golden glow */
+.hand-card-wrapper.selected {
+  transform: rotate(var(--r, 0deg)) translateY(-35px) scale(1.08);
+  filter:
+    drop-shadow(0 0 20px rgba(251, 191, 36, 0.7)) drop-shadow(0 20px 30px rgba(0, 0, 0, 0.5));
+  z-index: 100 !important;
+  margin: 0 -5px;
+}
+
+.hand-card-wrapper.selected:first-child {
+  margin-left: 12px;
+}
+
+.hand-card-wrapper.selected:last-child {
+  margin-right: 12px;
+}
+
+/* Deal animation */
+@keyframes cardSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(60px) rotate(0deg) scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(var(--r, 0deg)) scale(1);
+  }
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+
+@media (max-width: 375px) {
+  .hand-scroll {
+    padding: 45px 6px 12px;
+  }
+
+  .hand-cards {
+    padding: 0 10px;
+  }
+
+  .hand-card-wrapper {
+    margin: 0 -22px;
+  }
+
+  .hand-card-wrapper.selected {
+    transform: rotate(var(--r, 0deg)) translateY(-28px) scale(1.06);
+  }
+
+  .turn-badge {
+    font-size: 0.75em;
+    padding: 6px 18px;
+    top: 8px;
+  }
+}
+
+@media (min-width: 481px) {
+  .hand-scroll {
+    padding: 55px 20px 20px;
+  }
+
+  .hand-cards {
+    padding: 0 25px;
+  }
+
+  .hand-card-wrapper {
+    margin: 0 -15px;
+  }
+
+  .hand-card-wrapper:hover {
+    transform: rotate(var(--r, 0deg)) translateY(-25px) scale(1.06);
+  }
+
+  .hand-card-wrapper.selected {
+    transform: rotate(var(--r, 0deg)) translateY(-45px) scale(1.1);
+  }
+
+  .turn-badge {
+    font-size: 0.95em;
+    padding: 10px 28px;
+    top: 12px;
+  }
+}
+
+/* Landscape */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hand-scroll {
+    padding: 40px 8px 10px;
+  }
+
+  .hand-card-wrapper {
+    margin: 0 -25px;
+  }
+
+  .hand-card-wrapper.selected {
+    transform: rotate(var(--r, 0deg)) translateY(-22px) scale(1.05);
+  }
+
+  .turn-badge {
+    font-size: 0.7em;
+    padding: 5px 14px;
+    top: 6px;
+  }
+}
+
+/* Touch feedback */
+@media (hover: none) and (pointer: coarse) {
+  .hand-card-wrapper:active:not(.selected) {
+    transform: rotate(var(--r, 0deg)) scale(0.95);
+    transition-duration: 0.1s;
+  }
+}
