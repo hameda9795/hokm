@@ -23,8 +23,8 @@ export class TelegramBot {
 
     this.setupCommands();
     this.setupMiddleware();
+    this.setupAdminHandlers();  // Admin handlers FIRST (before message:text catches everything)
     this.setupHandlers();
-    this.setupAdminHandlers();
   }
 
   private setupCommands() {
