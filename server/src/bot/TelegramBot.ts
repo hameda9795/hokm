@@ -212,7 +212,7 @@ export class TelegramBot {
   private setupAdminHandlers() {
     // اضافه کردن گروه
     this.bot.command('addgroup', async (ctx) => {
-      if (!this.isAdminCommand(ctx)) return;
+      if (!await this.isAdminCommand(ctx)) return;
 
       const args = ctx.match?.split(' ') || [];
       if (args.length < 2) {
@@ -258,7 +258,7 @@ export class TelegramBot {
 
     // حذف گروه
     this.bot.command('removegroup', async (ctx) => {
-      if (!this.isAdminCommand(ctx)) return;
+      if (!await this.isAdminCommand(ctx)) return;
 
       const chatIdStr = ctx.match?.trim();
       if (!chatIdStr) {
@@ -287,7 +287,7 @@ export class TelegramBot {
 
     // تمدید گروه
     this.bot.command('extendgroup', async (ctx) => {
-      if (!this.isAdminCommand(ctx)) return;
+      if (!await this.isAdminCommand(ctx)) return;
 
       const args = ctx.match?.split(' ') || [];
       if (args.length < 2) {
@@ -331,7 +331,7 @@ export class TelegramBot {
 
     // لیست گروه‌ها
     this.bot.command('groups', async (ctx) => {
-      if (!this.isAdminCommand(ctx)) return;
+      if (!await this.isAdminCommand(ctx)) return;
 
       const groups = this.groupAuthService.getAllGroups();
       const stats = this.groupAuthService.getStats();
@@ -363,7 +363,7 @@ export class TelegramBot {
 
     // اطلاعات یک گروه
     this.bot.command('groupinfo', async (ctx) => {
-      if (!this.isAdminCommand(ctx)) return;
+      if (!await this.isAdminCommand(ctx)) return;
 
       const chatIdStr = ctx.match?.trim();
       if (!chatIdStr) {
@@ -406,7 +406,7 @@ export class TelegramBot {
 
     // راهنمای ادمین
     this.bot.command('adminhelp', async (ctx) => {
-      if (!this.isAdminCommand(ctx)) return;
+      if (!await this.isAdminCommand(ctx)) return;
 
       await ctx.reply(
         '🔧 دستورات مدیریت\n\n' +
@@ -423,17 +423,25 @@ export class TelegramBot {
   }
 
   // بررسی دسترسی ادمین
-  private isAdminCommand(ctx: Context): boolean {
+  private async isAdminCommand(ctx: Context): Promise<boolean> {
+    console.log(`[AdminCheck] Chat type: ${ctx.chat?.type}, User ID: ${ctx.from?.id}`);
+
     if (ctx.chat?.type !== 'private') {
-      // دستورات ادمین فقط در چت خصوصی
+      console.log('[AdminCheck] Not private chat, rejecting');
       return false;
     }
 
     const userId = ctx.from?.id;
-    if (!userId) return false;
+    if (!userId) {
+      console.log('[AdminCheck] No user ID found');
+      return false;
+    }
 
-    if (!this.groupAuthService.isAdmin(userId)) {
-      ctx.reply('❌ شما دسترسی ادمین ندارید.');
+    const isAdmin = this.groupAuthService.isAdmin(userId);
+    console.log(`[AdminCheck] User ${userId} isAdmin: ${isAdmin}`);
+
+    if (!isAdmin) {
+      await ctx.reply('❌ شما دسترسی ادمین ندارید.');
       return false;
     }
 
