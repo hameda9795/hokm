@@ -7,6 +7,7 @@ import { webhookCallback } from 'grammy';
 import { SocketHandler } from './socket/SocketHandler.js';
 import { gameManager } from './game/GameManager.js';
 import { TelegramBot } from './bot/TelegramBot.js';
+import { groupAuthService } from './services/GroupAuthService.js';
 import {
   ServerToClientEvents,
   ClientToServerEvents
@@ -61,6 +62,11 @@ app.get('/api/games', (req, res) => {
   res.json(games);
 });
 
+// آمار گروه‌های مجاز
+app.get('/api/groups/stats', (req, res) => {
+  res.json(groupAuthService.getStats());
+});
+
 // Cleanup inactive games every 5 minutes
 setInterval(() => {
   const cleaned = gameManager.cleanupInactiveGames(30);
@@ -68,6 +74,17 @@ setInterval(() => {
     console.log(`🧹 Cleaned up ${cleaned} inactive games`);
   }
 }, 5 * 60 * 1000);
+
+// Check for expired groups every hour and send notifications
+setInterval(async () => {
+  if (telegramBot) {
+    try {
+      await telegramBot.notifyExpiredGroups();
+    } catch (error) {
+      console.error('Error checking expired groups:', error);
+    }
+  }
+}, 60 * 60 * 1000); // هر ساعت
 
 const PORT = process.env.PORT || 3000;
 

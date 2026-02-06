@@ -1,5 +1,6 @@
 import { Bot, InlineKeyboard, Context } from 'grammy';
 import { GameManager } from '../game/GameManager.js';
+import { groupAuthService, GroupAuthService } from '../services/GroupAuthService.js';
 
 interface BotConfig {
   token: string;
@@ -12,14 +13,18 @@ export class TelegramBot {
   private miniAppUrl: string;
   private gameManager: GameManager;
   private activeTournaments: Map<number, string> = new Map(); // chatId -> gameId
+  private groupAuthService: GroupAuthService;
 
   constructor(config: BotConfig) {
     this.bot = new Bot(config.token);
     this.miniAppUrl = config.miniAppUrl;
     this.gameManager = config.gameManager;
+    this.groupAuthService = groupAuthService;
 
     this.setupCommands();
+    this.setupMiddleware();
     this.setupHandlers();
+    this.setupAdminHandlers();
   }
 
   private setupCommands() {
@@ -31,6 +36,56 @@ export class TelegramBot {
       { command: 'help', description: '❓ راهنمای بازی' },
       { command: 'cancel', description: '❌ لغو بازی فعلی' }
     ]);
+  }
+
+  // Middleware برای بررسی مجوز گروه
+  private setupMiddleware() {
+    this.bot.use(async (ctx, next) => {
+      // در چت خصوصی همیشه اجازه بده (برای دستورات ادمین)
+      if (ctx.chat?.type === 'private') {
+        await next();
+        return;
+      }
+
+      // فقط برای گروه‌ها چک کن
+      if (ctx.chat?.type === 'group' || ctx.chat?.type === 'supergroup') {
+        const chatId = ctx.chat.id;
+        const authResult = this.groupAuthService.checkAuthorization(chatId);
+        const adminUsername = this.groupAuthService.getAdminUsername();
+
+        if (authResult.status === 'authorized') {
+          // گروه مجاز است
+          await next();
+        } else if (authResult.status === 'expired') {
+          // اعتبار تمام شده
+          // فقط یک بار پیام بده (برای هر دستور نه)
+          const messageText = ctx.message?.text || '';
+          if (messageText.startsWith('/play') || messageText.startsWith('/newgame') ||
+              messageText === 'بازی حکم' || messageText === 'بازی' || messageText === 'حکم بازی') {
+            await ctx.reply(
+              '⚠️ اعتبار استفاده از ربات در این گروه به پایان رسیده است.\n\n' +
+              `📅 تاریخ انقضا: ${authResult.group?.expiresAt.toLocaleDateString('fa-IR')}\n` +
+              `📩 برای تمدید به @${adminUsername} پیام دهید.`
+            );
+          }
+          // دستورات /help و /status رو بذار کار کنه
+          if (messageText.startsWith('/help') || messageText.startsWith('/status')) {
+            await next();
+          }
+        } else {
+          // گروه مجاز نیست
+          const messageText = ctx.message?.text || '';
+          if (messageText.startsWith('/play') || messageText.startsWith('/newgame') ||
+              messageText.startsWith('/start') ||
+              messageText === 'بازی حکم' || messageText === 'بازی' || messageText === 'حکم بازی') {
+            await ctx.reply(
+              '❌ این گروه مجوز استفاده از ربات را ندارد.\n\n' +
+              `📩 برای دریافت مجوز به @${adminUsername} پیام دهید.`
+            );
+          }
+        }
+      }
+    });
   }
 
   private setupHandlers() {
@@ -151,6 +206,238 @@ export class TelegramBot {
     this.bot.catch((err) => {
       console.error('Bot error:', err);
     });
+  }
+
+  // دستورات مدیریت برای ادمین
+  private setupAdminHandlers() {
+    // اضافه کردن گروه
+    this.bot.command('addgroup', async (ctx) => {
+      if (!this.isAdminCommand(ctx)) return;
+
+      const args = ctx.match?.split(' ') || [];
+      if (args.length < 2) {
+        await ctx.reply(
+          '❌ فرمت دستور نادرست است.\n\n' +
+          '✅ فرمت صحیح:\n' +
+          '`/addgroup <chatId> <days> [name]`\n\n' +
+          '📝 مثال:\n' +
+          '`/addgroup -1001234567890 30 گروه دوستان`',
+          { parse_mode: 'Markdown' }
+        );
+        return;
+      }
+
+      const chatId = parseInt(args[0]);
+      const days = parseInt(args[1]);
+      const groupName = args.slice(2).join(' ') || `گروه ${chatId}`;
+
+      if (isNaN(chatId) || isNaN(days)) {
+        await ctx.reply('❌ chatId و days باید عدد باشند.');
+        return;
+      }
+
+      if (days <= 0) {
+        await ctx.reply('❌ تعداد روز باید بزرگتر از صفر باشد.');
+        return;
+      }
+
+      try {
+        const group = this.groupAuthService.addGroup(chatId, groupName, days, ctx.from?.username || 'admin');
+        await ctx.reply(
+          `✅ گروه با موفقیت اضافه شد!\n\n` +
+          `📋 نام: ${group.groupName}\n` +
+          `🆔 شناسه: \`${group.chatId}\`\n` +
+          `📅 اعتبار تا: ${group.expiresAt.toLocaleDateString('fa-IR')}\n` +
+          `⏰ روز باقیمانده: ${days}`,
+          { parse_mode: 'Markdown' }
+        );
+      } catch (error) {
+        await ctx.reply(`❌ خطا در اضافه کردن گروه: ${error}`);
+      }
+    });
+
+    // حذف گروه
+    this.bot.command('removegroup', async (ctx) => {
+      if (!this.isAdminCommand(ctx)) return;
+
+      const chatIdStr = ctx.match?.trim();
+      if (!chatIdStr) {
+        await ctx.reply(
+          '❌ لطفاً شناسه گروه را وارد کنید.\n\n' +
+          '✅ فرمت صحیح:\n' +
+          '`/removegroup <chatId>`',
+          { parse_mode: 'Markdown' }
+        );
+        return;
+      }
+
+      const chatId = parseInt(chatIdStr);
+      if (isNaN(chatId)) {
+        await ctx.reply('❌ شناسه گروه باید عدد باشد.');
+        return;
+      }
+
+      const removed = this.groupAuthService.removeGroup(chatId);
+      if (removed) {
+        await ctx.reply(`✅ گروه \`${chatId}\` با موفقیت حذف شد.`, { parse_mode: 'Markdown' });
+      } else {
+        await ctx.reply(`❌ گروهی با شناسه \`${chatId}\` یافت نشد.`, { parse_mode: 'Markdown' });
+      }
+    });
+
+    // تمدید گروه
+    this.bot.command('extendgroup', async (ctx) => {
+      if (!this.isAdminCommand(ctx)) return;
+
+      const args = ctx.match?.split(' ') || [];
+      if (args.length < 2) {
+        await ctx.reply(
+          '❌ فرمت دستور نادرست است.\n\n' +
+          '✅ فرمت صحیح:\n' +
+          '`/extendgroup <chatId> <days>`\n\n' +
+          '📝 مثال:\n' +
+          '`/extendgroup -1001234567890 30`',
+          { parse_mode: 'Markdown' }
+        );
+        return;
+      }
+
+      const chatId = parseInt(args[0]);
+      const days = parseInt(args[1]);
+
+      if (isNaN(chatId) || isNaN(days)) {
+        await ctx.reply('❌ chatId و days باید عدد باشند.');
+        return;
+      }
+
+      if (days <= 0) {
+        await ctx.reply('❌ تعداد روز باید بزرگتر از صفر باشد.');
+        return;
+      }
+
+      const group = this.groupAuthService.extendGroup(chatId, days);
+      if (group) {
+        await ctx.reply(
+          `✅ اعتبار گروه تمدید شد!\n\n` +
+          `📋 نام: ${group.groupName}\n` +
+          `🆔 شناسه: \`${group.chatId}\`\n` +
+          `📅 اعتبار جدید تا: ${group.expiresAt.toLocaleDateString('fa-IR')}`,
+          { parse_mode: 'Markdown' }
+        );
+      } else {
+        await ctx.reply(`❌ گروهی با شناسه \`${chatId}\` یافت نشد.`, { parse_mode: 'Markdown' });
+      }
+    });
+
+    // لیست گروه‌ها
+    this.bot.command('groups', async (ctx) => {
+      if (!this.isAdminCommand(ctx)) return;
+
+      const groups = this.groupAuthService.getAllGroups();
+      const stats = this.groupAuthService.getStats();
+
+      if (groups.length === 0) {
+        await ctx.reply('📋 هیچ گروهی ثبت نشده است.');
+        return;
+      }
+
+      let message = `📋 لیست گروه‌ها (${stats.total} گروه)\n`;
+      message += `✅ فعال: ${stats.active} | ❌ منقضی: ${stats.expired}\n`;
+      message += '━━━━━━━━━━━━━━━\n\n';
+
+      const now = new Date();
+      groups.forEach((group, idx) => {
+        const isExpired = group.expiresAt < now;
+        const statusIcon = isExpired ? '❌' : '✅';
+        const daysLeft = Math.ceil((group.expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+        message += `${idx + 1}. ${statusIcon} ${group.groupName}\n`;
+        message += `   🆔 \`${group.chatId}\`\n`;
+        message += `   📅 ${group.expiresAt.toLocaleDateString('fa-IR')}`;
+        message += isExpired ? ' (منقضی)' : ` (${daysLeft} روز)`;
+        message += '\n\n';
+      });
+
+      await ctx.reply(message, { parse_mode: 'Markdown' });
+    });
+
+    // اطلاعات یک گروه
+    this.bot.command('groupinfo', async (ctx) => {
+      if (!this.isAdminCommand(ctx)) return;
+
+      const chatIdStr = ctx.match?.trim();
+      if (!chatIdStr) {
+        await ctx.reply(
+          '❌ لطفاً شناسه گروه را وارد کنید.\n\n' +
+          '✅ فرمت صحیح:\n' +
+          '`/groupinfo <chatId>`',
+          { parse_mode: 'Markdown' }
+        );
+        return;
+      }
+
+      const chatId = parseInt(chatIdStr);
+      if (isNaN(chatId)) {
+        await ctx.reply('❌ شناسه گروه باید عدد باشد.');
+        return;
+      }
+
+      const group = this.groupAuthService.getGroupInfo(chatId);
+      if (!group) {
+        await ctx.reply(`❌ گروهی با شناسه \`${chatId}\` یافت نشد.`, { parse_mode: 'Markdown' });
+        return;
+      }
+
+      const now = new Date();
+      const isExpired = group.expiresAt < now;
+      const daysLeft = Math.ceil((group.expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+      await ctx.reply(
+        `📊 اطلاعات گروه\n\n` +
+        `📋 نام: ${group.groupName}\n` +
+        `🆔 شناسه: \`${group.chatId}\`\n` +
+        `📅 تاریخ ایجاد: ${group.createdAt.toLocaleDateString('fa-IR')}\n` +
+        `📅 تاریخ انقضا: ${group.expiresAt.toLocaleDateString('fa-IR')}\n` +
+        `⏰ وضعیت: ${isExpired ? '❌ منقضی شده' : `✅ فعال (${daysLeft} روز باقیمانده)`}\n` +
+        `👤 اضافه شده توسط: @${group.addedBy}`,
+        { parse_mode: 'Markdown' }
+      );
+    });
+
+    // راهنمای ادمین
+    this.bot.command('adminhelp', async (ctx) => {
+      if (!this.isAdminCommand(ctx)) return;
+
+      await ctx.reply(
+        '🔧 دستورات مدیریت\n\n' +
+        '📝 مدیریت گروه‌ها:\n' +
+        '`/addgroup <chatId> <days> [name]` - اضافه کردن گروه\n' +
+        '`/removegroup <chatId>` - حذف گروه\n' +
+        '`/extendgroup <chatId> <days>` - تمدید اعتبار\n' +
+        '`/groups` - لیست همه گروه‌ها\n' +
+        '`/groupinfo <chatId>` - اطلاعات گروه\n\n' +
+        '💡 نکته: برای گرفتن chatId گروه، ربات را به گروه اضافه کنید و هر پیامی بفرستید. آیدی در لاگ سرور نشان داده می‌شود.',
+        { parse_mode: 'Markdown' }
+      );
+    });
+  }
+
+  // بررسی دسترسی ادمین
+  private isAdminCommand(ctx: Context): boolean {
+    if (ctx.chat?.type !== 'private') {
+      // دستورات ادمین فقط در چت خصوصی
+      return false;
+    }
+
+    const userId = ctx.from?.id;
+    if (!userId) return false;
+
+    if (!this.groupAuthService.isAdmin(userId)) {
+      ctx.reply('❌ شما دسترسی ادمین ندارید.');
+      return false;
+    }
+
+    return true;
   }
 
   private async handlePlayCommand(ctx: Context, forceNew: boolean = false) {
@@ -314,6 +601,26 @@ export class TelegramBot {
     }
   }
 
+  // متد برای ارسال اطلاع‌رسانی انقضا به گروه‌های منقضی
+  async notifyExpiredGroups() {
+    const expiredGroups = this.groupAuthService.getExpiredGroupsToNotify();
+    const adminUsername = this.groupAuthService.getAdminUsername();
+
+    for (const group of expiredGroups) {
+      try {
+        await this.bot.api.sendMessage(group.chatId,
+          '⚠️ اعتبار استفاده از ربات در این گروه به پایان رسیده است.\n\n' +
+          `📅 تاریخ انقضا: ${group.expiresAt.toLocaleDateString('fa-IR')}\n` +
+          `📩 برای تمدید به @${adminUsername} پیام دهید.`
+        );
+        this.groupAuthService.markAsNotified(group.chatId);
+        console.log(`[Bot] Sent expiration notice to group ${group.chatId}`);
+      } catch (error) {
+        console.error(`[Bot] Failed to send expiration notice to ${group.chatId}:`, error);
+      }
+    }
+  }
+
   // شروع بات
   async start() {
     await this.bot.start({
@@ -337,5 +644,9 @@ export class TelegramBot {
 
   getBot() {
     return this.bot;
+  }
+
+  getGroupAuthService() {
+    return this.groupAuthService;
   }
 }
