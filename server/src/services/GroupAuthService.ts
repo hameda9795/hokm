@@ -23,21 +23,15 @@ export interface AuthorizationResult {
 }
 
 export class GroupAuthService {
-  private adminTelegramId: number;
-  private adminUsername: string;
-
-  constructor() {
-    this.adminTelegramId = parseInt(process.env.ADMIN_TELEGRAM_ID || '0');
-    this.adminUsername = process.env.ADMIN_TELEGRAM_USERNAME || 'max_hmd';
-  }
-
-  // بررسی آیا کاربر ادمین است
+  // بررسی آیا کاربر ادمین است - هر بار از env میخونه
   isAdmin(telegramId: number): boolean {
-    return telegramId === this.adminTelegramId;
+    const adminId = parseInt(process.env.ADMIN_TELEGRAM_ID || '0');
+    console.log(`[Auth] Checking admin: user=${telegramId}, admin=${adminId}, match=${telegramId === adminId}`);
+    return telegramId === adminId;
   }
 
   getAdminUsername(): string {
-    return this.adminUsername;
+    return process.env.ADMIN_TELEGRAM_USERNAME || 'max_hmd';
   }
 
   // اضافه کردن گروه جدید

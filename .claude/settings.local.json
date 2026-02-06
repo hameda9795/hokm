@@ -16,7 +16,8 @@
       "Bash(d:/tmp/hokm/cloudflared.exe tunnel --url http://localhost:3001)",
       "Bash(npm run build:server:*)",
       "Bash(npm run build:client:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(ssh -o StrictHostKeyChecking=no root@91.99.49.208 \"cd /opt/hokm && cat docker-compose.yml | grep -A10 ''environment:''\")"
     ]
   }
 }
