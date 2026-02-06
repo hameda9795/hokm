@@ -50,6 +50,14 @@ export class TelegramBot {
       // فقط برای گروه‌ها چک کن
       if (ctx.chat?.type === 'group' || ctx.chat?.type === 'supergroup') {
         const chatId = ctx.chat.id;
+        const messageText = ctx.message?.text || '';
+
+        // پیام‌های فعالسازی را همیشه اجازه بده (برای ادمین)
+        if (/^\/?(فعالسازی|gameactive|فعال‌سازی|active)$/i.test(messageText)) {
+          await next();
+          return;
+        }
+
         const authResult = this.groupAuthService.checkAuthorization(chatId);
         const adminUsername = this.groupAuthService.getAdminUsername();
 
@@ -210,8 +218,8 @@ export class TelegramBot {
 
   // دستورات مدیریت برای ادمین
   private setupAdminHandlers() {
-    // فعالسازی گروه با پیام متنی در گروه
-    this.bot.hears(/^(فعالسازی|gameactive|فعال‌سازی|active)$/i, async (ctx) => {
+    // فعالسازی گروه با پیام متنی در گروه (با یا بدون /)
+    this.bot.hears(/^\/?(فعالسازی|gameactive|فعال‌سازی|active)$/i, async (ctx) => {
       // فقط در گروه
       if (ctx.chat?.type !== 'group' && ctx.chat?.type !== 'supergroup') {
         return;
