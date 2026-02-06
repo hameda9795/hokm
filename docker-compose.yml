@@ -32,6 +32,8 @@ services:
       - REDIS_URL=redis://redis:6379
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - TELEGRAM_WEBHOOK_DOMAIN=${TELEGRAM_WEBHOOK_DOMAIN}
+      - ADMIN_TELEGRAM_ID=${ADMIN_TELEGRAM_ID}
+      - ADMIN_TELEGRAM_USERNAME=${ADMIN_TELEGRAM_USERNAME}
     depends_on:
       redis:
         condition: service_healthy
