@@ -1,4 +1,8 @@
+import dotenv from 'dotenv';
 import db from '../db/database.js';
+
+// Load environment variables early
+dotenv.config();
 
 export interface AuthorizedGroup {
   chatId: number;
