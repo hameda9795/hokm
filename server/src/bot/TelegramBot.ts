@@ -210,7 +210,113 @@ export class TelegramBot {
 
   // دستورات مدیریت برای ادمین
   private setupAdminHandlers() {
-    // اضافه کردن گروه
+    // فعالسازی گروه با پیام متنی در گروه
+    this.bot.hears(/^(فعالسازی|gameactive|فعال‌سازی|active)$/i, async (ctx) => {
+      // فقط در گروه
+      if (ctx.chat?.type !== 'group' && ctx.chat?.type !== 'supergroup') {
+        return;
+      }
+
+      // فقط ادمین اصلی
+      const userId = ctx.from?.id;
+      if (!userId || !this.groupAuthService.isAdmin(userId)) {
+        return; // بدون پیام خطا - فقط نادیده بگیر
+      }
+
+      const chatId = ctx.chat.id;
+      const chatTitle = ctx.chat.title || 'گروه';
+
+      // چک کن آیا گروه قبلا فعاله
+      const existing = this.groupAuthService.getGroupInfo(chatId);
+      if (existing && existing.expiresAt > new Date()) {
+        const daysLeft = Math.ceil((existing.expiresAt.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+        await ctx.reply(
+          `✅ این گروه از قبل فعال است!\n\n` +
+          `📋 نام: ${existing.groupName}\n` +
+          `⏰ ${daysLeft} روز باقیمانده\n\n` +
+          `برای تمدید یکی از گزینه‌ها را انتخاب کنید:`,
+          {
+            reply_markup: new InlineKeyboard()
+              .text('➕ 7 روز', `extend_${chatId}_7`).text('➕ 14 روز', `extend_${chatId}_14`).row()
+              .text('➕ 30 روز', `extend_${chatId}_30`).text('➕ 60 روز', `extend_${chatId}_60`).row()
+              .text('➕ 90 روز', `extend_${chatId}_90`)
+          }
+        );
+        return;
+      }
+
+      // نمایش دکمه‌های انتخاب مدت
+      const keyboard = new InlineKeyboard()
+        .text('7 روز', `activate_${chatId}_7_${encodeURIComponent(chatTitle)}`).text('14 روز', `activate_${chatId}_14_${encodeURIComponent(chatTitle)}`).row()
+        .text('30 روز', `activate_${chatId}_30_${encodeURIComponent(chatTitle)}`).text('60 روز', `activate_${chatId}_60_${encodeURIComponent(chatTitle)}`).row()
+        .text('90 روز', `activate_${chatId}_90_${encodeURIComponent(chatTitle)}`);
+
+      await ctx.reply(
+        `🎮 فعالسازی ربات برای گروه "${chatTitle}"\n\n` +
+        `لطفاً مدت اعتبار را انتخاب کنید:`,
+        { reply_markup: keyboard }
+      );
+    });
+
+    // هندل کردن دکمه‌های فعالسازی
+    this.bot.on('callback_query:data', async (ctx) => {
+      const data = ctx.callbackQuery.data;
+      const userId = ctx.from?.id;
+
+      // فقط ادمین اصلی
+      if (!userId || !this.groupAuthService.isAdmin(userId)) {
+        await ctx.answerCallbackQuery({ text: '❌ فقط مالک ربات میتواند این کار را انجام دهد.' });
+        return;
+      }
+
+      // فعالسازی گروه
+      if (data.startsWith('activate_')) {
+        const parts = data.split('_');
+        const chatId = parseInt(parts[1]);
+        const days = parseInt(parts[2]);
+        const chatTitle = decodeURIComponent(parts.slice(3).join('_'));
+
+        try {
+          const group = this.groupAuthService.addGroup(chatId, chatTitle, days, ctx.from?.username || 'admin');
+          await ctx.editMessageText(
+            `✅ گروه با موفقیت فعال شد!\n\n` +
+            `📋 نام: ${chatTitle}\n` +
+            `⏰ اعتبار: ${days} روز\n` +
+            `📅 تا تاریخ: ${group.expiresAt.toLocaleDateString('fa-IR')}\n\n` +
+            `حالا میتونید با دستور /play بازی رو شروع کنید! 🎮`
+          );
+          await ctx.answerCallbackQuery({ text: '✅ گروه فعال شد!' });
+        } catch (error) {
+          await ctx.answerCallbackQuery({ text: '❌ خطا در فعالسازی' });
+        }
+        return;
+      }
+
+      // تمدید گروه
+      if (data.startsWith('extend_')) {
+        const parts = data.split('_');
+        const chatId = parseInt(parts[1]);
+        const days = parseInt(parts[2]);
+
+        try {
+          const group = this.groupAuthService.extendGroup(chatId, days);
+          if (group) {
+            await ctx.editMessageText(
+              `✅ اعتبار گروه تمدید شد!\n\n` +
+              `📋 نام: ${group.groupName}\n` +
+              `➕ ${days} روز اضافه شد\n` +
+              `📅 اعتبار تا: ${group.expiresAt.toLocaleDateString('fa-IR')}`
+            );
+            await ctx.answerCallbackQuery({ text: '✅ تمدید شد!' });
+          }
+        } catch (error) {
+          await ctx.answerCallbackQuery({ text: '❌ خطا در تمدید' });
+        }
+        return;
+      }
+    });
+
+    // اضافه کردن گروه (دستور قدیمی هم کار کنه)
     this.bot.command('addgroup', async (ctx) => {
       if (!await this.isAdminCommand(ctx)) return;
 
