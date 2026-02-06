@@ -41,6 +41,12 @@ export class TelegramBot {
   // Middleware برای بررسی مجوز گروه
   private setupMiddleware() {
     this.bot.use(async (ctx, next) => {
+      // Callback query ها را همیشه اجازه بده
+      if (ctx.callbackQuery) {
+        await next();
+        return;
+      }
+
       // در چت خصوصی همیشه اجازه بده (برای دستورات ادمین)
       if (ctx.chat?.type === 'private') {
         await next();
