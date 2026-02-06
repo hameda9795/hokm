@@ -186,7 +186,7 @@ export class TelegramBot {
       const userId = ctx.from?.id;
 
       // فعالسازی گروه
-      if (data.startsWith('activate_')) {
+      if (data.startsWith('act_')) {
         if (!userId || !this.groupAuthService.isAdmin(userId)) {
           await ctx.answerCallbackQuery({ text: '❌ فقط مالک ربات میتواند این کار را انجام دهد.' });
           return;
@@ -195,7 +195,10 @@ export class TelegramBot {
         const parts = data.split('_');
         const chatId = parseInt(parts[1]);
         const days = parseInt(parts[2]);
-        const chatTitle = decodeURIComponent(parts.slice(3).join('_'));
+        // نام گروه را از context بگیر (callback در همان چت است)
+        const chatTitle = ctx.chat?.type === 'supergroup' || ctx.chat?.type === 'group'
+          ? (ctx.chat as any).title || `گروه ${chatId}`
+          : `گروه ${chatId}`;
 
         try {
           const group = this.groupAuthService.addGroup(chatId, chatTitle, days, ctx.from?.username || 'admin');
@@ -215,7 +218,7 @@ export class TelegramBot {
       }
 
       // تمدید گروه
-      if (data.startsWith('extend_')) {
+      if (data.startsWith('ext_')) {
         if (!userId || !this.groupAuthService.isAdmin(userId)) {
           await ctx.answerCallbackQuery({ text: '❌ فقط مالک ربات میتواند این کار را انجام دهد.' });
           return;
@@ -314,19 +317,19 @@ export class TelegramBot {
           `برای تمدید یکی از گزینه‌ها را انتخاب کنید:`,
           {
             reply_markup: new InlineKeyboard()
-              .text('➕ 7 روز', `extend_${chatId}_7`).text('➕ 14 روز', `extend_${chatId}_14`).row()
-              .text('➕ 30 روز', `extend_${chatId}_30`).text('➕ 60 روز', `extend_${chatId}_60`).row()
-              .text('➕ 90 روز', `extend_${chatId}_90`)
+              .text('➕ 7 روز', `ext_${chatId}_7`).text('➕ 14 روز', `ext_${chatId}_14`).row()
+              .text('➕ 30 روز', `ext_${chatId}_30`).text('➕ 60 روز', `ext_${chatId}_60`).row()
+              .text('➕ 90 روز', `ext_${chatId}_90`)
           }
         );
         return;
       }
 
-      // نمایش دکمه‌های انتخاب مدت
+      // نمایش دکمه‌های انتخاب مدت (بدون نام گروه در callback - خیلی طولانی میشه)
       const keyboard = new InlineKeyboard()
-        .text('7 روز', `activate_${chatId}_7_${encodeURIComponent(chatTitle)}`).text('14 روز', `activate_${chatId}_14_${encodeURIComponent(chatTitle)}`).row()
-        .text('30 روز', `activate_${chatId}_30_${encodeURIComponent(chatTitle)}`).text('60 روز', `activate_${chatId}_60_${encodeURIComponent(chatTitle)}`).row()
-        .text('90 روز', `activate_${chatId}_90_${encodeURIComponent(chatTitle)}`);
+        .text('7 روز', `act_${chatId}_7`).text('14 روز', `act_${chatId}_14`).row()
+        .text('30 روز', `act_${chatId}_30`).text('60 روز', `act_${chatId}_60`).row()
+        .text('90 روز', `act_${chatId}_90`);
 
       await ctx.reply(
         `🎮 فعالسازی ربات برای گروه "${chatTitle}"\n\n` +
