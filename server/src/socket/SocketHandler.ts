@@ -22,13 +22,13 @@ export class SocketHandler {
       console.log(`Client connected: ${socket.id}`);
 
       // ایجاد بازی جدید
-      socket.on('game:create', (playerName: string, telegramId?: string) => {
-        this.handleCreateGame(socket, playerName, telegramId);
+      socket.on('game:create', (playerName: string, telegramId?: string, photoUrl?: string) => {
+        this.handleCreateGame(socket, playerName, telegramId, photoUrl);
       });
 
       // پیوستن به بازی
-      socket.on('game:join', (gameId: string, playerName: string, telegramId?: string) => {
-        this.handleJoinGame(socket, gameId, playerName, telegramId);
+      socket.on('game:join', (gameId: string, playerName: string, telegramId?: string, photoUrl?: string) => {
+        this.handleJoinGame(socket, gameId, playerName, telegramId, photoUrl);
       });
 
       // خروج از بازی
@@ -79,9 +79,9 @@ export class SocketHandler {
     });
   }
 
-  private handleCreateGame(socket: GameSocket, playerName: string, telegramId?: string): void {
+  private handleCreateGame(socket: GameSocket, playerName: string, telegramId?: string, photoUrl?: string): void {
     const gameId = gameManager.createGame();
-    const player = gameManager.joinGame(gameId, socket.id, playerName, telegramId);
+    const player = gameManager.joinGame(gameId, socket.id, playerName, telegramId, photoUrl);
 
     if (player) {
       socket.join(gameId);
@@ -94,8 +94,8 @@ export class SocketHandler {
     }
   }
 
-  private handleJoinGame(socket: GameSocket, gameId: string, playerName: string, telegramId?: string): void {
-    const player = gameManager.joinGame(gameId, socket.id, playerName, telegramId);
+  private handleJoinGame(socket: GameSocket, gameId: string, playerName: string, telegramId?: string, photoUrl?: string): void {
+    const player = gameManager.joinGame(gameId, socket.id, playerName, telegramId, photoUrl);
 
     if (player) {
       socket.join(gameId);

@@ -69,6 +69,9 @@ export const Game: React.FC = () => {
       // Telegram ID بازیکن
       const telegramId = user?.id?.toString();
 
+      // عکس پروفایل تلگرام
+      const photoUrl = user?.photo_url;
+
       // دریافت gameId از چند منبع مختلف
       const urlParams = new URLSearchParams(window.location.search);
       let gameId = urlParams.get('gameId');
@@ -139,11 +142,11 @@ export const Game: React.FC = () => {
       if (gameId) {
         // پیوستن به بازی موجود
         console.log('[Game] Joining game:', gameId);
-        joinGame(gameId, playerName, telegramId);
+        joinGame(gameId, playerName, telegramId, photoUrl);
       } else {
         // ایجاد بازی جدید (اولین نفر)
         console.log('[Game] Creating new game');
-        createGame(playerName, telegramId);
+        createGame(playerName, telegramId, photoUrl);
       }
     }, 500); // تاخیر 500 میلی‌ثانیه برای اطمینان از لود شدن user
 

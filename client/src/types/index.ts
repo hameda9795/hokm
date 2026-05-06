@@ -22,6 +22,7 @@ export interface Player {
   id: string;
   name: string;
   telegramId?: string;
+  photoUrl?: string;
   position: PlayerPosition;
   team: TeamId;
   hand: Card[];

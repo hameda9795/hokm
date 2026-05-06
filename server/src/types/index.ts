@@ -22,6 +22,7 @@ export interface Player {
   id: string;
   name: string;
   telegramId?: string;
+  photoUrl?: string;
   position: PlayerPosition;
   team: TeamId;
   hand: Card[];
@@ -107,12 +108,12 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerEvents {
-  'game:join': (gameId: string, playerName: string, telegramId?: string) => void;
+  'game:join': (gameId: string, playerName: string, telegramId?: string, photoUrl?: string) => void;
   'game:leave': () => void;
   'game:playCard': (cardId: string) => void;
   'game:selectHokm': (suit: Suit) => void;
   'game:ready': () => void;
-  'game:create': (playerName: string, telegramId?: string) => void;
+  'game:create': (playerName: string, telegramId?: string, photoUrl?: string) => void;
   'game:setRoundsToWin': (roundsToWin: RoundsToWinOption) => void;
   'game:startGame': () => void;
   'game:addBot': () => void;

@@ -75,7 +75,7 @@ export const WaitingRoom: React.FC<WaitingRoomProps> = ({
             const player = players.find(p => p.position === position);
             const team = position % 2 === 0 ? 'team1' : 'team2';
             const avatarPath = player
-              ? getPlayerAvatar(player.id, player.position, player.isBot || false)
+              ? getPlayerAvatar(player.id, player.position, player.isBot || false, player.photoUrl)
               : null;
 
             return (

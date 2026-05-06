@@ -65,7 +65,7 @@ export class HokmEngine {
   // مدیریت بازیکنان
   // ============================================
 
-  addPlayer(id: string, name: string, telegramId?: string): Player | null {
+  addPlayer(id: string, name: string, telegramId?: string, photoUrl?: string): Player | null {
     if (this.state.players.length >= 4) {
       return null;
     }
@@ -82,6 +82,7 @@ export class HokmEngine {
       id,
       name,
       telegramId,
+      photoUrl,
       position,
       team,
       hand: [],

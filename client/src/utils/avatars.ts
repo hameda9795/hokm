@@ -15,9 +15,13 @@ export const getBotAvatarPath = (): string => {
 };
 
 // Get avatar for a player based on their position or ID
-export const getPlayerAvatar = (_playerId: string, position: number, isBot: boolean): string => {
+export const getPlayerAvatar = (_playerId: string, position: number, isBot: boolean, photoUrl?: string): string => {
   if (isBot) {
     return getBotAvatarPath();
+  }
+  // Use Telegram profile photo if available
+  if (photoUrl) {
+    return photoUrl;
   }
   // Use position + 1 as avatar index (positions are 0-3)
   return getAvatarPath(position + 1);

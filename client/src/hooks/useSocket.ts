@@ -104,12 +104,12 @@ export const useSocket = () => {
     };
   }, []);
 
-  const createGame = useCallback((playerName: string, telegramId?: string) => {
-    socketRef.current?.emit('game:create', playerName, telegramId);
+  const createGame = useCallback((playerName: string, telegramId?: string, photoUrl?: string) => {
+    socketRef.current?.emit('game:create', playerName, telegramId, photoUrl);
   }, []);
 
-  const joinGame = useCallback((gameId: string, playerName: string, telegramId?: string) => {
-    socketRef.current?.emit('game:join', gameId, playerName, telegramId);
+  const joinGame = useCallback((gameId: string, playerName: string, telegramId?: string, photoUrl?: string) => {
+    socketRef.current?.emit('game:join', gameId, playerName, telegramId, photoUrl);
   }, []);
 
   const leaveGame = useCallback(() => {

@@ -41,11 +41,11 @@ export class GameManager {
     return null;
   }
 
-  joinGame(gameId: string, playerId: string, playerName: string, telegramId?: string): Player | null {
+  joinGame(gameId: string, playerId: string, playerName: string, telegramId?: string, photoUrl?: string): Player | null {
     const engine = this.getGame(gameId);
     if (!engine) return null;
 
-    const player = engine.addPlayer(playerId, playerName, telegramId);
+    const player = engine.addPlayer(playerId, playerName, telegramId, photoUrl);
     if (player) {
       this.playerToGame.set(playerId, gameId);
     }

@@ -57,7 +57,7 @@ export const GameTable: React.FC<GameTableProps> = ({
           const isHakem = player.id === hakemId;
           const isMe = player.id === myPlayerId;
           const isCurrentTurn = player.id === currentPlayerId;
-          const avatarPath = getPlayerAvatar(player.id, player.position, player.isBot || false);
+          const avatarPath = getPlayerAvatar(player.id, player.position, player.isBot || false, player.photoUrl);
 
           return (
             <div key={player.id} className={`player-slot ${positionClasses[relPos]}`}>
