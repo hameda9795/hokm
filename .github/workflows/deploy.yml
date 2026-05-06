@@ -36,34 +36,32 @@ jobs:
             echo "📥 Pulling latest changes..."
             git pull origin main
             
-            # Create .env file if not exists
-            if [ ! -f .env ]; then
-              echo "📝 Creating .env file..."
-              cat > .env << EOF
-            TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}
-            TELEGRAM_WEBHOOK_DOMAIN=https://hokm.maxhmd.dev
-            NODE_ENV=production
-            EOF
-            fi
+            # Create/Update .env file
+            echo "📝 Updating .env file..."
+            echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" > .env
+            echo "TELEGRAM_WEBHOOK_DOMAIN=https://hokm.maxhmd.dev" >> .env
+            echo "NODE_ENV=production" >> .env
+            echo "ADMIN_TELEGRAM_ID=${{ secrets.ADMIN_TELEGRAM_ID }}" >> .env
+            echo "ADMIN_TELEGRAM_USERNAME=${{ secrets.ADMIN_TELEGRAM_USERNAME }}" >> .env
             
             # Build and restart containers
             echo "🏗️  Building Docker containers..."
-            docker-compose build --no-cache
+            docker compose build --no-cache
             
             echo "🔄 Restarting services..."
-            docker-compose down
-            docker-compose up -d
+            docker compose down
+            docker compose up -d
             
             # Health check
             echo "🏥 Waiting for services to start..."
             sleep 10
             
             # Check if services are running
-            if docker-compose ps | grep -q "Up"; then
+            if docker compose ps | grep -q "Up"; then
               echo "✅ Services are running"
             else
               echo "❌ Services failed to start"
-              docker-compose logs --tail=50
+              docker compose logs --tail=50
               exit 1
             fi
 
