@@ -11,6 +11,7 @@
   flex-direction: column;
   position: relative;
   overflow: hidden;
+  overflow-y: auto;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
