@@ -23,12 +23,18 @@ export class SocketHandler {
 
       // ایجاد بازی جدید
       socket.on('game:create', (playerName: string, telegramId?: string, photoUrl?: string) => {
-        this.handleCreateGame(socket, playerName, telegramId, photoUrl);
+        this.handleCreateGame(socket, playerName, telegramId, photoUrl).catch(err => {
+          console.error('[Socket] Error in handleCreateGame:', err);
+          socket.emit('game:error', 'خطای داخلی سرور');
+        });
       });
 
       // پیوستن به بازی
       socket.on('game:join', (gameId: string, playerName: string, telegramId?: string, photoUrl?: string) => {
-        this.handleJoinGame(socket, gameId, playerName, telegramId, photoUrl);
+        this.handleJoinGame(socket, gameId, playerName, telegramId, photoUrl).catch(err => {
+          console.error('[Socket] Error in handleJoinGame:', err);
+          socket.emit('game:error', 'خطای داخلی سرور');
+        });
       });
 
       // خروج از بازی
@@ -79,12 +85,12 @@ export class SocketHandler {
     });
   }
 
-  private handleCreateGame(socket: GameSocket, playerName: string, telegramId?: string, photoUrl?: string): void {
+  private async handleCreateGame(socket: GameSocket, playerName: string, telegramId?: string, photoUrl?: string): Promise<void> {
     const gameId = gameManager.createGame();
     const player = gameManager.joinGame(gameId, socket.id, playerName, telegramId, photoUrl);
 
     if (player) {
-      socket.join(gameId);
+      await socket.join(gameId);
       const engine = gameManager.getGame(gameId)!;
 
       socket.emit('game:state', engine.getStateForPlayer(socket.id));
@@ -94,17 +100,21 @@ export class SocketHandler {
     }
   }
 
-  private handleJoinGame(socket: GameSocket, gameId: string, playerName: string, telegramId?: string, photoUrl?: string): void {
+  private async handleJoinGame(socket: GameSocket, gameId: string, playerName: string, telegramId?: string, photoUrl?: string): Promise<void> {
     const player = gameManager.joinGame(gameId, socket.id, playerName, telegramId, photoUrl);
 
     if (player) {
-      socket.join(gameId);
+      // مهم: socket.join async است و باید await شود
+      await socket.join(gameId);
       const engine = gameManager.getGame(gameId)!;
 
-      // اطلاع‌رسانی به همه بازیکنان
-      this.io.to(gameId).emit('game:playerJoined', player);
+      // ارسال state مستقیم به بازیکن جدید (مهم‌تر از broadcast)
+      socket.emit('game:state', engine.getStateForPlayer(socket.id));
 
-      // ارسال state به همه
+      // اطلاع‌رسانی به بقیه بازیکنان
+      socket.to(gameId).emit('game:playerJoined', player);
+
+      // ارسال state به بقیه
       this.broadcastGameState(gameId);
 
       // اطلاع‌رسانی به گروه تلگرام
